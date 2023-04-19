@@ -1,6 +1,6 @@
 .key {
   background-color: white;
-  font-family: 'Roboto', sans-serif;
+
   font-weight: 700;
   font-size: 1.5rem;
   min-width: 4rem;
@@ -12,6 +12,16 @@
   position: relative;
   padding: 1.5rem;
   cursor: pointer;
+  transition: 0.3s;
+
+  &:hover {
+    background-color: #6a4c93;
+    color: white;
+  }
+  &.active {
+    background-color: #ff595e;
+    color: white;
+  }
 
   .key-main-value {
     font-weight: 700;

@@ -186,6 +186,8 @@ export default class Keyboard {
 
   render() {
     this.keyboard = `
+    <div class="keyboard-container">
+    <textarea id="text" name="text" class="keyboard-textarea" placeholder="Type something..."></textarea>
       <ul class="keyboard">
         <li class="keyboard-row">
         ${this.makeKeyArray(this.alpabet.slice(0, 14))}</li>
@@ -198,6 +200,8 @@ export default class Keyboard {
         <li class="keyboard-row">
         ${this.makeKeyArray(this.alpabet.slice(54, this.alpabet.length))}</li>
       </ul>
+    </div>
+    
     `;
     return this.keyboard;
   }
