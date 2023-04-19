@@ -58,7 +58,6 @@ export default class Keyboard {
       'c',
       'x',
       'z',
-
       'Shift',
       'Ctrl',
       'Win',
@@ -69,7 +68,6 @@ export default class Keyboard {
       '←',
       '↑',
       '↓',
-
       '→',
     ];
     this.ru = [
@@ -153,6 +151,9 @@ export default class Keyboard {
       ')',
       '_',
       '+',
+      '',
+      '',
+      '/',
     ];
     this.alpabet = this.merge(this.eng, this.ru, this.additions);
     this.isShiftActive = false;
@@ -166,11 +167,9 @@ export default class Keyboard {
         value: element,
         secondValue: arr2[index],
         addition: arr3[index] ?? null,
-        isLong: element.length > 1,
         isSpecial: element.length > 1,
       });
     });
-    console.log(this.array);
     return this.array;
   }
 
@@ -213,21 +212,21 @@ export default class Keyboard {
     return this.keyboard;
   }
 
-  shiftBehaviour() {
-    const buttons = document.querySelectorAll('[data-value="shift"]');
-    buttons.forEach((element) => {
+  toggleSpecialButton(keyName) {
+    const keys = document.querySelectorAll(`[data-value="${keyName}"]`);
+    keys.forEach((element) => {
       element.classList.toggle('active');
-      this.isShiftActive = element.classList.contains('active');
+      const triggerStatus = element.classList.contains('active');
+
+      if (keyName === 'shift') {
+        this.isShiftActive = triggerStatus;
+      } else if (keyName === 'capslock') {
+        this.isCapsActive = triggerStatus;
+      }
     });
   }
 
-  capsBehaviour() {
-    const caps = document.querySelector('[data-value="capslock"]');
-    caps.classList.toggle('active');
-    this.isCapsActive = caps.classList.contains('active');
-  }
-
-  tapKey(keyName, addition = null) {
+  static toggleKeyAnimation(keyName) {
     document
       .querySelector(`[data-value="${keyName}"]`)
       ?.classList.add('pressed');
@@ -237,50 +236,55 @@ export default class Keyboard {
         .querySelector(`[data-value="${keyName}"]`)
         ?.classList.remove('pressed');
     }, 300);
+  }
+
+  tapKey(keyName, addition = null) {
+    Keyboard.toggleKeyAnimation(keyName);
+    this.changeTextarea(keyName, addition);
+  }
+
+  changeTextarea(keyName, addition = null) {
     const textArea = document.getElementById('text');
-    if (this.isShiftActive && this.isCapsActive) {
-      textArea.value += keyName;
-      this.shiftBehaviour();
-    } else if (this.isShiftActive && !this.isCapsActive) {
-      textArea.value += addition ?? keyName.toUpperCase();
-      this.shiftBehaviour();
-    } else if (!this.isShiftActive && this.isCapsActive) {
-      textArea.value += addition ?? keyName.toUpperCase();
-    } else {
-      textArea.value += keyName;
+    let valueToConcat = keyName;
+
+    if (this.isShiftActive !== this.isCapsActive) {
+      valueToConcat = addition ?? keyName.toUpperCase();
     }
+
+    if (this.isShiftActive && this.isCapsActive) {
+      this.toggleSpecialButton('shift');
+    } else if (this.isShiftActive && !this.isCapsActive) {
+      this.toggleSpecialButton('shift');
+    }
+
+    textArea.value += valueToConcat;
   }
 
   addListener() {
-    this.values = [];
     document.addEventListener('keydown', (event) => {
       const keyName = event.key;
-      this.values.push(keyName);
       if (keyName === 'Shift') {
-        this.shiftBehaviour();
+        this.toggleSpecialButton('shift');
       } else if (keyName === 'CapsLock') {
-        this.capsBehaviour();
-      } else if (/^[A-Za-zА-Яа-я]$/.test(keyName)) {
-        this.tapKey(keyName);
-      } else if (/^[0-9|`|\-|=]$/.test(keyName)) {
-        this.tapKey(keyName);
+        this.toggleSpecialButton('capslock');
+      } else if (/^[A-Za-zА-Яа-я0-9|`|\-|=]$/.test(keyName)) {
+        const target = document.querySelector(`[data-value="${keyName}"]`);
+        const addition = target.getAttribute('data-additional-value') || null;
+        this.tapKey(keyName, addition);
       }
     });
 
     document.addEventListener('click', (event) => {
       if (event.target.closest('[data-value="shift"]')) {
-        this.shiftBehaviour();
+        this.toggleSpecialButton('shift');
       } else if (event.target.closest('[data-value="capslock"]')) {
-        this.capsBehaviour();
+        this.toggleSpecialButton('capslock');
       } else if (event.target.closest('.key_letters')) {
         this.tapKey(event.target.innerText);
       } else if (event.target.closest('.key_digits')) {
-        const addition = event.target
-          .closest('.key_digits')
-          ?.querySelector('.key-addition-value')?.innerText;
-        const value = event.target
-          .closest('.key_digits')
-          ?.querySelector('.key-main-value')?.innerText;
+        const target = event.target.closest('.key_digits');
+        const value = target.getAttribute('data-value');
+        const addition = target.getAttribute('data-additional-value');
         this.tapKey(value, addition);
       }
     });
