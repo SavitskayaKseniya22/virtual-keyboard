@@ -1,0 +1,30 @@
+.key {
+  background-color: white;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  min-width: 4rem;
+  height: 4rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 1.5rem;
+  cursor: pointer;
+
+  .key-main-value {
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  .key-addition-value {
+    position: absolute;
+    font-weight: 500;
+    font-size: 1rem;
+    left: 0.5rem;
+    top: 0.5rem;
+  }
+  &.key_long {
+    flex-grow: 1;
+  }
+}

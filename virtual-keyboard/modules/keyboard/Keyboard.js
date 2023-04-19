@@ -1,3 +1,6 @@
+/* eslint-disable import/extensions */
+import Key from '../key/Key.js';
+
 export default class Keyboard {
   constructor() {
     this.status = false;
@@ -16,6 +19,7 @@ export default class Keyboard {
       '-',
       '=',
       'Backspace',
+      'Del',
       '\\',
       ']',
       '[',
@@ -42,6 +46,7 @@ export default class Keyboard {
       'l',
       ';',
       "'",
+      'Enter',
       'Shift',
       '/',
       '.',
@@ -53,18 +58,18 @@ export default class Keyboard {
       'c',
       'x',
       'z',
-      'Enter',
+
       'Shift',
-      'Control',
-      'Meta',
+      'Ctrl',
+      'Win',
       'Alt',
-      ' ',
+      'Space',
       'Alt',
-      'Control',
-      'ArrowLeft',
-      'ArrowDown',
-      'ArrowRight',
-      'ArrowUp',
+      'Ctrl',
+      '←',
+      '↓',
+      '→',
+      '↑',
     ];
     this.ru = [
       'ё',
@@ -81,6 +86,7 @@ export default class Keyboard {
       '-',
       '=',
       'Backspace',
+      'Del',
       '\\',
       'ъ',
       'х',
@@ -119,41 +125,81 @@ export default class Keyboard {
       'с',
       'ч',
       'я',
-      'Enter',
+
       'Shift',
-      'Control',
-      'Meta',
+      'Ctrl',
+      'Win',
       'Alt',
-      ' ',
-      'AltGraph',
-      'Control',
-      'ArrowLeft',
-      'ArrowDown',
-      'ArrowRight',
-      'ArrowUp',
+      'Space',
+      'Alt',
+      'Ctrl',
+      '←',
+      '↓',
+      '→',
+      '↑',
     ];
-    this.alpabet = this.merge(this.eng, this.ru);
+    this.additions = [
+      '~',
+      '!',
+      '@',
+      '#',
+      '$',
+      '%',
+      '^',
+      '&',
+      '*',
+      '(',
+      ')',
+      '_',
+      '+',
+    ];
+    this.alpabet = this.merge(this.eng, this.ru, this.additions);
   }
 
-  merge(arr, arr2) {
-    this.obj = {};
+  merge(arr, arr2, arr3) {
+    this.array = [];
     arr.forEach((element, index) => {
-      this.obj[`key${index}`] = [String(element)].concat([String(arr2[index])]);
+      this.array.push({
+        value: element,
+        secondValue: arr2[index],
+        addition: arr3[index] ?? null,
+        isLong: element.length > 1,
+      });
     });
-    console.log(this.obj);
+    console.log(this.array);
+    return this.array;
+  }
+
+  makeKey(element) {
+    const key = new Key(element);
+    this.keyContent = key.render();
+    return this.keyContent;
+  }
+
+  makeKeyArray(array) {
+    this.keyboardContent = [];
+    array.forEach((element) => {
+      this.keyboardContent.push(this.makeKey(element));
+    });
+    return this.keyboardContent.join('');
   }
 
   render() {
-    this.html = `
+    this.keyboard = `
       <ul class="keyboard">
-        <li class="keyboard-row"></li>
-        <li class="keyboard-row"></li>
-        <li class="keyboard-row"></li>
-        <li class="keyboard-row"></li>
-        <li class="keyboard-row"></li>
+        <li class="keyboard-row">
+        ${this.makeKeyArray(this.alpabet.slice(0, 14))}</li>
+        <li class="keyboard-row">
+        ${this.makeKeyArray(this.alpabet.slice(14, 29).reverse())}</li>
+        <li class="keyboard-row">
+        ${this.makeKeyArray(this.alpabet.slice(29, 42))}</li>
+        <li class="keyboard-row">
+        ${this.makeKeyArray(this.alpabet.slice(42, 54).reverse())}</li>
+        <li class="keyboard-row">
+        ${this.makeKeyArray(this.alpabet.slice(54, this.alpabet.length))}</li>
       </ul>
     `;
-    return this.html;
+    return this.keyboard;
   }
 
   addListener() {
