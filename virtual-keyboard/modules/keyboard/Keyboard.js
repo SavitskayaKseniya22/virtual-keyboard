@@ -222,16 +222,16 @@ export default class Keyboard {
   }
 
   tapKey(keyName) {
-    document.querySelector(`.key_${keyName}`)?.classList.add('pressed');
+    document.querySelector(`.key_${keyName}`).classList.add('pressed');
     setTimeout(() => {
       document.querySelector(`.key_${keyName}`)?.classList.remove('pressed');
     }, 300);
     const textArea = document.getElementById('text');
     if (this.isShiftActive) {
-      textArea.value += keyName.trim().toUpperCase();
+      textArea.value += keyName.toUpperCase();
       this.shiftBehaviour();
     } else {
-      textArea.value += keyName.trim();
+      textArea.value += keyName;
     }
   }
 
@@ -254,7 +254,7 @@ export default class Keyboard {
         event.target.closest('.key') &&
         !event.target.closest('.key').classList.contains('key_special')
       ) {
-        this.tapKey(event.target.textContent);
+        this.tapKey(event.target.innerText);
       }
     });
 

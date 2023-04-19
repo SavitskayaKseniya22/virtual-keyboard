@@ -95,7 +95,7 @@ body {
 }
 @keyframes press {
   25% {
-    bottom: -10px;
+    bottom: -5px;
     background-color: #ffca3a;
     color: white;
   }
