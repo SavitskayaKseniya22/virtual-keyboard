@@ -19,8 +19,13 @@
     color: white;
   }
   &.active {
-    background-color: #ff595e;
     color: white;
+    &[data-value='shift'] {
+      background-color: #ff595e;
+    }
+    &[data-value='capslock'] {
+      background-color: #1982c4;
+    }
   }
   &.pressed {
     animation-name: press;
@@ -53,7 +58,7 @@
     left: 0.5rem;
     top: 0.5rem;
   }
-  &.key_long {
+  &.key_special {
     flex-grow: 1;
   }
 }

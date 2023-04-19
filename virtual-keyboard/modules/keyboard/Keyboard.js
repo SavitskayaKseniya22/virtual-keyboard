@@ -214,22 +214,38 @@ export default class Keyboard {
   }
 
   shiftBehaviour() {
-    const buttons = document.querySelectorAll('.key_shift');
+    const buttons = document.querySelectorAll('[data-value="shift"]');
     buttons.forEach((element) => {
       element.classList.toggle('active');
       this.isShiftActive = element.classList.contains('active');
     });
   }
 
-  tapKey(keyName) {
-    document.querySelector(`.key_${keyName}`).classList.add('pressed');
+  capsBehaviour() {
+    const caps = document.querySelector('[data-value="capslock"]');
+    caps.classList.toggle('active');
+    this.isCapsActive = caps.classList.contains('active');
+  }
+
+  tapKey(keyName, addition = null) {
+    document
+      .querySelector(`[data-value="${keyName}"]`)
+      ?.classList.add('pressed');
+
     setTimeout(() => {
-      document.querySelector(`.key_${keyName}`)?.classList.remove('pressed');
+      document
+        .querySelector(`[data-value="${keyName}"]`)
+        ?.classList.remove('pressed');
     }, 300);
     const textArea = document.getElementById('text');
-    if (this.isShiftActive) {
-      textArea.value += keyName.toUpperCase();
+    if (this.isShiftActive && this.isCapsActive) {
+      textArea.value += keyName;
       this.shiftBehaviour();
+    } else if (this.isShiftActive && !this.isCapsActive) {
+      textArea.value += addition ?? keyName.toUpperCase();
+      this.shiftBehaviour();
+    } else if (!this.isShiftActive && this.isCapsActive) {
+      textArea.value += addition ?? keyName.toUpperCase();
     } else {
       textArea.value += keyName;
     }
@@ -242,19 +258,30 @@ export default class Keyboard {
       this.values.push(keyName);
       if (keyName === 'Shift') {
         this.shiftBehaviour();
+      } else if (keyName === 'CapsLock') {
+        this.capsBehaviour();
       } else if (/^[A-Za-zА-Яа-я]$/.test(keyName)) {
+        this.tapKey(keyName);
+      } else if (/^[0-9|`|\-|=]$/.test(keyName)) {
         this.tapKey(keyName);
       }
     });
 
     document.addEventListener('click', (event) => {
-      if (event.target.closest('.key_shift')) {
+      if (event.target.closest('[data-value="shift"]')) {
         this.shiftBehaviour();
-      } else if (
-        event.target.closest('.key') &&
-        !event.target.closest('.key').classList.contains('key_special')
-      ) {
+      } else if (event.target.closest('[data-value="capslock"]')) {
+        this.capsBehaviour();
+      } else if (event.target.closest('.key_letters')) {
         this.tapKey(event.target.innerText);
+      } else if (event.target.closest('.key_digits')) {
+        const addition = event.target
+          .closest('.key_digits')
+          ?.querySelector('.key-addition-value')?.innerText;
+        const value = event.target
+          .closest('.key_digits')
+          ?.querySelector('.key-main-value')?.innerText;
+        this.tapKey(value, addition);
       }
     });
 

@@ -85,8 +85,13 @@ body {
   color: white;
 }
 .key.active {
-  background-color: #ff595e;
   color: white;
+}
+.key.active[data-value=shift] {
+  background-color: #ff595e;
+}
+.key.active[data-value=capslock] {
+  background-color: #1982c4;
 }
 .key.pressed {
   animation-name: press;
@@ -116,6 +121,6 @@ body {
   left: 0.5rem;
   top: 0.5rem;
 }
-.key.key_long {
+.key.key_special {
   flex-grow: 1;
 }/*# sourceMappingURL=style.css.map */
