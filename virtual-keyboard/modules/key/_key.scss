@@ -22,6 +22,25 @@
     background-color: #ff595e;
     color: white;
   }
+  &.pressed {
+    animation-name: press;
+    animation-duration: 0.3s;
+    position: relative;
+  }
+
+  @keyframes press {
+    25% {
+      bottom: -10px;
+      background-color: #ffca3a;
+      color: white;
+    }
+
+    100% {
+      bottom: 0px;
+      background-color: white;
+      color: black;
+    }
+  }
 
   .key-main-value {
     font-weight: 700;

@@ -3,7 +3,7 @@ import Key from '../key/Key.js';
 
 export default class Keyboard {
   constructor() {
-    this.status = false;
+    this.lang = window.localStorage.getItem('lang') || 'ENG';
     this.eng = [
       '`',
       '1',
@@ -67,9 +67,10 @@ export default class Keyboard {
       'Alt',
       'Ctrl',
       '←',
-      '↓',
-      '→',
       '↑',
+      '↓',
+
+      '→',
     ];
     this.ru = [
       'ё',
@@ -134,9 +135,9 @@ export default class Keyboard {
       'Alt',
       'Ctrl',
       '←',
+      '↑',
       '↓',
       '→',
-      '↑',
     ];
     this.additions = [
       '~',
@@ -154,6 +155,8 @@ export default class Keyboard {
       '+',
     ];
     this.alpabet = this.merge(this.eng, this.ru, this.additions);
+    this.isShiftActive = false;
+    this.isCapsActive = false;
   }
 
   merge(arr, arr2, arr3) {
@@ -164,6 +167,7 @@ export default class Keyboard {
         secondValue: arr2[index],
         addition: arr3[index] ?? null,
         isLong: element.length > 1,
+        isSpecial: element.length > 1,
       });
     });
     console.log(this.array);
@@ -201,9 +205,34 @@ export default class Keyboard {
         ${this.makeKeyArray(this.alpabet.slice(54, this.alpabet.length))}</li>
       </ul>
     </div>
+    <p class="keyboard-addition">
+   <b>${this.lang}</b> 
+    <br> Press Shift + Alt to change language</p>
     
     `;
     return this.keyboard;
+  }
+
+  shiftBehaviour() {
+    const buttons = document.querySelectorAll('.key_shift');
+    buttons.forEach((element) => {
+      element.classList.toggle('active');
+      this.isShiftActive = element.classList.contains('active');
+    });
+  }
+
+  tapKey(keyName) {
+    document.querySelector(`.key_${keyName}`)?.classList.add('pressed');
+    setTimeout(() => {
+      document.querySelector(`.key_${keyName}`)?.classList.remove('pressed');
+    }, 300);
+    const textArea = document.getElementById('text');
+    if (this.isShiftActive) {
+      textArea.value += keyName.trim().toUpperCase();
+      this.shiftBehaviour();
+    } else {
+      textArea.value += keyName.trim();
+    }
   }
 
   addListener() {
@@ -211,7 +240,26 @@ export default class Keyboard {
     document.addEventListener('keydown', (event) => {
       const keyName = event.key;
       this.values.push(keyName);
-      console.log(this.values);
+      if (keyName === 'Shift') {
+        this.shiftBehaviour();
+      } else if (/^[A-Za-zА-Яа-я]$/.test(keyName)) {
+        this.tapKey(keyName);
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('.key_shift')) {
+        this.shiftBehaviour();
+      } else if (
+        event.target.closest('.key') &&
+        !event.target.closest('.key').classList.contains('key_special')
+      ) {
+        this.tapKey(event.target.textContent);
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      window.localStorage.setItem('lang', this.lang);
     });
   }
 }
