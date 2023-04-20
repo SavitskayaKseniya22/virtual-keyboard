@@ -267,8 +267,9 @@ export default class Keyboard {
   }
 
   tapKey(keyName, addition = null) {
-    Keyboard.toggleKeyAnimation(keyName);
-    this.changeTextarea(keyName, addition);
+    const key = this.transliterationLetter(keyName);
+    Keyboard.toggleKeyAnimation(key);
+    this.changeTextarea(key, addition);
   }
 
   changeTextarea(keyName, addition = null) {
@@ -276,7 +277,7 @@ export default class Keyboard {
     let valueToConcat = keyName;
 
     if (this.isShiftActive !== this.isCapsActive) {
-      valueToConcat = addition ?? keyName.toUpperCase();
+      valueToConcat = addition || keyName.toUpperCase();
     }
 
     if (this.isShiftActive && this.isCapsActive) {
@@ -284,8 +285,21 @@ export default class Keyboard {
     } else if (this.isShiftActive && !this.isCapsActive) {
       this.toggleSpecialButton('shift');
     }
-
     textArea.value += valueToConcat;
+  }
+
+  transliterationLetter(item) {
+    const lang = window.localStorage.getItem('lang');
+
+    if (lang === 'RU' && this.eng.includes(item || item.toLowerCase())) {
+      const index = this.eng.indexOf(item);
+      return this.ru[index];
+    }
+    if (lang === 'ENG' && this.ru.includes(item || item.toLowerCase())) {
+      const index = this.ru.indexOf(item);
+      return this.eng[index];
+    }
+    return item;
   }
 
   addListener() {
@@ -310,13 +324,19 @@ export default class Keyboard {
         this.toggleSpecialButton('shift');
       } else if (event.target.closest('[data-value="capslock"]')) {
         this.toggleSpecialButton('capslock');
-      } else if (event.target.closest('.key_letters')) {
-        this.tapKey(event.target.innerText);
-      } else if (event.target.closest('.key_digits')) {
-        const target = event.target.closest('.key_digits');
+      } else if (
+        event.target.closest('.key_digits') ||
+        event.target.closest('.key_letters')
+      ) {
+        const target =
+          event.target.closest('.key_digits') ||
+          event.target.closest('.key_letters');
         const value = target.getAttribute('data-value');
         const addition = target.getAttribute('data-additional-value');
         this.tapKey(value, addition);
+      } else if (event.target.closest('[data-value="ctrl"]')) {
+        Keyboard.changeLang(true);
+        Keyboard.saveLang();
       }
     });
   }

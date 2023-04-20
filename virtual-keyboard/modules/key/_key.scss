@@ -69,4 +69,8 @@
     height: 4rem;
     font-weight: 400;
   }
+  &.key_space,
+  &.key_enter {
+    flex-grow: 15;
+  }
 }
