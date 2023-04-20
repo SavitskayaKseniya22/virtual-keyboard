@@ -267,9 +267,8 @@ export default class Keyboard {
   }
 
   tapKey(keyName, addition = null) {
-    const key = this.transliterationLetter(keyName);
-    Keyboard.toggleKeyAnimation(key);
-    this.changeTextarea(key, addition);
+    Keyboard.toggleKeyAnimation(keyName);
+    this.changeTextarea(keyName, addition);
   }
 
   changeTextarea(keyName, addition = null) {
@@ -288,18 +287,26 @@ export default class Keyboard {
     textArea.value += valueToConcat;
   }
 
-  transliterationLetter(item) {
+  transliterationLetter(keyName, keyCode = null) {
     const lang = window.localStorage.getItem('lang');
 
-    if (lang === 'RU' && this.eng.includes(item || item.toLowerCase())) {
-      const index = this.eng.indexOf(item);
+    if (
+      keyName === '.' &&
+      ((lang === 'ENG' && keyCode === 'Period') ||
+        (lang === 'RU' && keyCode === 'Slash'))
+    ) {
+      return '.';
+    }
+
+    if (lang === 'RU' && this.eng.includes(keyName || keyName.toLowerCase())) {
+      const index = this.eng.indexOf(keyName);
       return this.ru[index];
     }
-    if (lang === 'ENG' && this.ru.includes(item || item.toLowerCase())) {
-      const index = this.ru.indexOf(item);
+    if (lang === 'ENG' && this.ru.includes(keyName || keyName.toLowerCase())) {
+      const index = this.ru.indexOf(keyName);
       return this.eng[index];
     }
-    return item;
+    return keyName;
   }
 
   addListener() {
@@ -312,7 +319,8 @@ export default class Keyboard {
       } else if (keyName.length === 1) {
         const target = document.querySelector(`[data-value="${keyName}"]`);
         const addition = target?.getAttribute('data-additional-value') || null;
-        this.tapKey(keyName, addition);
+        const key = this.transliterationLetter(keyName, event.code);
+        this.tapKey(key, addition);
       } else if (keyName === 'Control') {
         Keyboard.changeLang(true);
         Keyboard.saveLang();
