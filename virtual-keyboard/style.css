@@ -123,4 +123,9 @@ body {
 }
 .key.key_special {
   flex-grow: 1;
+}
+.key.key_letters, .key.key_digits {
+  width: 4rem;
+  height: 4rem;
+  font-weight: 400;
 }/*# sourceMappingURL=style.css.map */

@@ -7,3 +7,4 @@ document
   .insertAdjacentHTML('afterbegin', keyboard.render());
 
 keyboard.addListener();
+Keyboard.setLang();

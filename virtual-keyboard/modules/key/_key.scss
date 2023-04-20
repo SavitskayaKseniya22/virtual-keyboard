@@ -51,6 +51,7 @@
     font-weight: 700;
     font-size: 1.5rem;
   }
+
   .key-addition-value {
     position: absolute;
     font-weight: 500;
@@ -58,7 +59,14 @@
     left: 0.5rem;
     top: 0.5rem;
   }
+
   &.key_special {
     flex-grow: 1;
+  }
+  &.key_letters,
+  &.key_digits {
+    width: 4rem;
+    height: 4rem;
+    font-weight: 400;
   }
 }

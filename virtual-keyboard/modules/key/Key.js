@@ -7,13 +7,16 @@ export default class Key {
   }
 
   render() {
-    const special = this.isSpecial ? ' key_special' : '';
-    const digits = /^[0-9|`|\-|=]$/.test(this.value) ? ' key_digits' : '';
-    const letters = /^[A-Za-zА-Яа-я]$/.test(this.value) ? ' key_letters' : '';
+    let className;
+    if (this.isSpecial) {
+      className = 'key_special';
+    } else {
+      className = /^[0-9`\-=]$/.test(this.value) ? 'key_digits' : 'key_letters';
+    }
 
     this.keyContent = `<div data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" data-additional-value="${
       this.addition
-    }" class="key${special}${digits}${letters}">
+    }" class="key ${className}">
       <span class="key-main-value">${this.value}</span
       ><span class="key-addition-value">${this.addition ?? ''}</span>
     </div>`;

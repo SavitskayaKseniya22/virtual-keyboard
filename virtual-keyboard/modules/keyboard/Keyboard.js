@@ -3,7 +3,6 @@ import Key from '../key/Key.js';
 
 export default class Keyboard {
   constructor() {
-    this.lang = window.localStorage.getItem('lang') || 'ENG';
     this.eng = [
       '`',
       '1',
@@ -205,7 +204,7 @@ export default class Keyboard {
       </ul>
     </div>
     <p class="keyboard-addition">
-   <b>${this.lang}</b> 
+   <b><span class="keyboard-addition__lang">${this.lang}</span></b>
     <br> Press Shift + Alt to change language</p>
     
     `;
@@ -224,6 +223,35 @@ export default class Keyboard {
         this.isCapsActive = triggerStatus;
       }
     });
+  }
+
+  static setLang() {
+    this.lang = window.localStorage.getItem('lang') || 'ENG';
+    if (this.lang === 'RU') {
+      Keyboard.changeLang();
+    }
+    Keyboard.saveLang();
+  }
+
+  static changeLang(trigger = null) {
+    const letters = document.querySelectorAll('.key_letters');
+    letters.forEach((elem) => {
+      const value = elem.getAttribute('data-value');
+      const secondValue = elem.getAttribute('data-second-value');
+      elem.setAttribute('data-value', secondValue);
+      elem.setAttribute('data-second-value', value);
+      const elemToChange = elem.querySelector('.key-main-value');
+      elemToChange.innerText = secondValue;
+    });
+
+    if (trigger) {
+      this.lang = window.localStorage.getItem('lang') === 'ENG' ? 'RU' : 'ENG';
+    }
+  }
+
+  static saveLang() {
+    window.localStorage.setItem('lang', this.lang);
+    document.querySelector('.keyboard-addition__lang').innerText = this.lang;
   }
 
   static toggleKeyAnimation(keyName) {
@@ -267,10 +295,13 @@ export default class Keyboard {
         this.toggleSpecialButton('shift');
       } else if (keyName === 'CapsLock') {
         this.toggleSpecialButton('capslock');
-      } else if (/^[A-Za-zА-Яа-я0-9|`|\-|=]$/.test(keyName)) {
+      } else if (keyName.length === 1) {
         const target = document.querySelector(`[data-value="${keyName}"]`);
-        const addition = target.getAttribute('data-additional-value') || null;
+        const addition = target?.getAttribute('data-additional-value') || null;
         this.tapKey(keyName, addition);
+      } else if (keyName === 'Control') {
+        Keyboard.changeLang(true);
+        Keyboard.saveLang();
       }
     });
 
@@ -287,10 +318,6 @@ export default class Keyboard {
         const addition = target.getAttribute('data-additional-value');
         this.tapKey(value, addition);
       }
-    });
-
-    window.addEventListener('beforeunload', () => {
-      window.localStorage.setItem('lang', this.lang);
     });
   }
 }
