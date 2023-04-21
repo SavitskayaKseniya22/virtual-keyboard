@@ -259,10 +259,12 @@ export default class Keyboard {
   switchLang() {
     if (this.isShiftActive) {
       this.toggleSpecialButton('shift');
+
       Keyboard.updateLangKeyboardLayout();
       this.lang = this.lang === 'ENG' ? 'RU' : 'ENG';
       Keyboard.saveLang(this.lang);
     }
+    this.toggleSpecialButton('ctrl');
   }
 
   static saveLang(langValue) {
@@ -288,11 +290,6 @@ export default class Keyboard {
     }, 300);
   }
 
-  tapKey(keyName, addition = null) {
-    Keyboard.toggleKeyAnimation(keyName);
-    this.changeTextarea(keyName, addition);
-  }
-
   changeTextarea(keyName, addition = null) {
     const textArea = document.getElementById('text');
     let valueToConcat = keyName;
@@ -310,21 +307,19 @@ export default class Keyboard {
   }
 
   transliterationLetter(keyName, keyCode = null) {
-    const lang = window.localStorage.getItem('lang');
-
     if (
       keyName === '.'
-      && ((lang === 'ENG' && keyCode === 'Period')
-        || (lang === 'RU' && keyCode === 'Slash'))
+      && ((this.lang === 'ENG' && keyCode === 'Period')
+        || (this.lang === 'RU' && keyCode === 'Slash'))
     ) {
       return '.';
     }
 
-    if (lang === 'RU' && this.eng.includes(keyName || keyName.toLowerCase())) {
+    if (this.lang === 'RU' && this.eng.includes(keyName || keyName.toLowerCase())) {
       const index = this.eng.indexOf(keyName);
       return this.ru[index];
     }
-    if (lang === 'ENG' && this.ru.includes(keyName || keyName.toLowerCase())) {
+    if (this.lang === 'ENG' && this.ru.includes(keyName || keyName.toLowerCase())) {
       const index = this.ru.indexOf(keyName);
       return this.eng[index];
     }
@@ -333,36 +328,36 @@ export default class Keyboard {
 
   addListener() {
     document.addEventListener('keydown', (event) => {
-      const keyName = event.key;
-      if (keyName === 'Shift' || keyName === 'CapsLock') {
+      let keyName = event.key.toLowerCase();
+      const key = this.transliterationLetter(keyName, event.code);
+      if (keyName === 'shift' || keyName === 'capsLock') {
         this.toggleSpecialButton(keyName.toLocaleLowerCase());
-      } else if (keyName === 'Control') {
+      } else if (keyName === 'control') {
         this.switchLang();
-        this.toggleSpecialButton('ctrl');
+        keyName = 'ctrl';
       } else if (keyName.length === 1) {
         const target = document.querySelector(`[data-value="${keyName}"]`);
         const addition = target?.getAttribute('data-additional-value') || null;
-        const key = this.transliterationLetter(keyName, event.code);
-        this.tapKey(key, addition);
+        this.changeTextarea(key, addition);
       }
+      Keyboard.toggleKeyAnimation(key);
     });
 
     document.addEventListener('click', (event) => {
-      if (event.target.closest('[data-value="shift"]')) {
-        this.toggleSpecialButton('shift');
-      } else if (event.target.closest('[data-value="capslock"]')) {
-        this.toggleSpecialButton('capslock');
-      } else if (event.target.closest('[data-value="ctrl"]')) {
-        this.switchLang();
-        this.toggleSpecialButton('ctrl');
-      } else if (
-        !event.target.closest('.key_special')
-        && event.target.closest('.key')
-      ) {
-        const target = event.target.closest('.key');
-        const value = target.getAttribute('data-value');
-        const addition = target.getAttribute('data-additional-value');
-        this.tapKey(value, addition);
+      const target = event.target.closest('.key');
+      if (target) {
+        const keyName = target.getAttribute('data-value');
+        if (keyName === 'shift' || keyName === 'capslock') {
+          this.toggleSpecialButton(keyName);
+        } else if (keyName === 'ctrl') {
+          this.switchLang();
+        } else if (
+          !target.classList.contains('.key_special')
+        ) {
+          const addition = target.getAttribute('data-additional-value');
+          this.changeTextarea(keyName, addition);
+        }
+        Keyboard.toggleKeyAnimation(keyName);
       }
     });
   }
