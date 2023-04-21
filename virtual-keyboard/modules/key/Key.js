@@ -6,15 +6,15 @@ export default class Key {
     this.isSpecial = keyObject.isSpecial;
   }
 
-  render() {
+  makeKeyHTML() {
     let className;
     if (this.isSpecial) {
       className = 'key_special';
     } else {
-      className = /^[0-9`\-=]$/.test(this.value) ? 'key_digits' : 'key_letters';
+      className = /^[0-9\-=]$/.test(this.value) ? 'key_digits' : 'key_letters';
     }
 
-    this.keyContent = `<div data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" data-additional-value="${
+    return `<div data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" data-additional-value="${
       this.addition || ''
     }" class="key ${className}${this.value === 'Space' ? ' key_space' : ''}${
       this.value === 'Enter' ? ' key_enter' : ''
@@ -22,6 +22,5 @@ export default class Key {
       <span class="key-main-value">${this.value}</span
       ><span class="key-addition-value">${this.addition ?? ''}</span>
     </div>`;
-    return this.keyContent;
   }
 }

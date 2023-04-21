@@ -3,6 +3,8 @@ import Key from '../key/Key.js';
 
 export default class Keyboard {
   constructor() {
+    this.lang = window.localStorage.getItem('lang') || 'ENG';
+
     this.eng = [
       '`',
       '1',
@@ -174,7 +176,7 @@ export default class Keyboard {
 
   makeKey(element) {
     const key = new Key(element);
-    this.keyContent = key.render();
+    this.keyContent = key.makeKeyHTML();
     return this.keyContent;
   }
 
@@ -186,8 +188,8 @@ export default class Keyboard {
     return this.keyboardContent.join('');
   }
 
-  render() {
-    this.keyboard = `
+  makeKeyboardHTML() {
+    return `
     <div class="keyboard-container">
     <textarea id="text" name="text" class="keyboard-textarea" placeholder="Type something..."></textarea>
       <ul class="keyboard">
@@ -205,10 +207,7 @@ export default class Keyboard {
     </div>
     <p class="keyboard-addition">
    <b><span class="keyboard-addition__lang">${this.lang}</span></b>
-    <br> Press Shift + Alt to change language</p>
-    
-    `;
-    return this.keyboard;
+    <br> Press Shift + Ctrl to change language</p>`;
   }
 
   toggleSpecialButton(keyName) {
@@ -219,21 +218,33 @@ export default class Keyboard {
 
       if (keyName === 'shift') {
         this.isShiftActive = triggerStatus;
+        Keyboard.updateCaseKeyboardLayout(
+          this.isShiftActive !== this.isCapsActive,
+        );
       } else if (keyName === 'capslock') {
         this.isCapsActive = triggerStatus;
+        Keyboard.updateCaseKeyboardLayout(
+          this.isShiftActive !== this.isCapsActive,
+        );
+      } else if (keyName === 'ctrl') {
+        setTimeout(() => {
+          element.classList.toggle('active');
+        }, 300);
       }
     });
   }
 
-  static setLang() {
-    this.lang = window.localStorage.getItem('lang') || 'ENG';
-    if (this.lang === 'RU') {
-      Keyboard.changeLang();
-    }
-    Keyboard.saveLang();
+  static updateCaseKeyboardLayout(trigger) {
+    const letters = document.querySelectorAll('.key_letters');
+    letters.forEach((elem) => {
+      const value = elem.getAttribute('data-value');
+      const changedValue = trigger ? value.toUpperCase() : value.toLowerCase();
+      const elemToChange = elem.querySelector('.key-main-value');
+      elemToChange.innerText = changedValue;
+    });
   }
 
-  static changeLang(trigger = null) {
+  static updateLangKeyboardLayout() {
     const letters = document.querySelectorAll('.key_letters');
     letters.forEach((elem) => {
       const value = elem.getAttribute('data-value');
@@ -243,15 +254,26 @@ export default class Keyboard {
       const elemToChange = elem.querySelector('.key-main-value');
       elemToChange.innerText = secondValue;
     });
+  }
 
-    if (trigger) {
-      this.lang = window.localStorage.getItem('lang') === 'ENG' ? 'RU' : 'ENG';
+  switchLang() {
+    if (this.isShiftActive) {
+      this.toggleSpecialButton('shift');
+      Keyboard.updateLangKeyboardLayout();
+      this.lang = this.lang === 'ENG' ? 'RU' : 'ENG';
+      Keyboard.saveLang(this.lang);
     }
   }
 
-  static saveLang() {
-    window.localStorage.setItem('lang', this.lang);
-    document.querySelector('.keyboard-addition__lang').innerText = this.lang;
+  static saveLang(langValue) {
+    window.localStorage.setItem('lang', langValue);
+    document.querySelector('.keyboard-addition__lang').innerText = langValue;
+  }
+
+  setLang() {
+    if (this.lang === 'RU') {
+      Keyboard.updateLangKeyboardLayout();
+    }
   }
 
   static toggleKeyAnimation(keyName) {
@@ -274,7 +296,6 @@ export default class Keyboard {
   changeTextarea(keyName, addition = null) {
     const textArea = document.getElementById('text');
     let valueToConcat = keyName;
-
     if (this.isShiftActive !== this.isCapsActive) {
       valueToConcat = addition || keyName.toUpperCase();
     }
@@ -284,6 +305,7 @@ export default class Keyboard {
     } else if (this.isShiftActive && !this.isCapsActive) {
       this.toggleSpecialButton('shift');
     }
+
     textArea.value += valueToConcat;
   }
 
@@ -291,9 +313,9 @@ export default class Keyboard {
     const lang = window.localStorage.getItem('lang');
 
     if (
-      keyName === '.' &&
-      ((lang === 'ENG' && keyCode === 'Period') ||
-        (lang === 'RU' && keyCode === 'Slash'))
+      keyName === '.'
+      && ((lang === 'ENG' && keyCode === 'Period')
+        || (lang === 'RU' && keyCode === 'Slash'))
     ) {
       return '.';
     }
@@ -312,18 +334,16 @@ export default class Keyboard {
   addListener() {
     document.addEventListener('keydown', (event) => {
       const keyName = event.key;
-      if (keyName === 'Shift') {
-        this.toggleSpecialButton('shift');
-      } else if (keyName === 'CapsLock') {
-        this.toggleSpecialButton('capslock');
+      if (keyName === 'Shift' || keyName === 'CapsLock') {
+        this.toggleSpecialButton(keyName.toLocaleLowerCase());
+      } else if (keyName === 'Control') {
+        this.switchLang();
+        this.toggleSpecialButton('ctrl');
       } else if (keyName.length === 1) {
         const target = document.querySelector(`[data-value="${keyName}"]`);
         const addition = target?.getAttribute('data-additional-value') || null;
         const key = this.transliterationLetter(keyName, event.code);
         this.tapKey(key, addition);
-      } else if (keyName === 'Control') {
-        Keyboard.changeLang(true);
-        Keyboard.saveLang();
       }
     });
 
@@ -332,19 +352,17 @@ export default class Keyboard {
         this.toggleSpecialButton('shift');
       } else if (event.target.closest('[data-value="capslock"]')) {
         this.toggleSpecialButton('capslock');
+      } else if (event.target.closest('[data-value="ctrl"]')) {
+        this.switchLang();
+        this.toggleSpecialButton('ctrl');
       } else if (
-        event.target.closest('.key_digits') ||
-        event.target.closest('.key_letters')
+        !event.target.closest('.key_special')
+        && event.target.closest('.key')
       ) {
-        const target =
-          event.target.closest('.key_digits') ||
-          event.target.closest('.key_letters');
+        const target = event.target.closest('.key');
         const value = target.getAttribute('data-value');
         const addition = target.getAttribute('data-additional-value');
         this.tapKey(value, addition);
-      } else if (event.target.closest('[data-value="ctrl"]')) {
-        Keyboard.changeLang(true);
-        Keyboard.saveLang();
       }
     });
   }

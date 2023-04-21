@@ -4,7 +4,7 @@ import Keyboard from './modules/keyboard/Keyboard.js';
 const keyboard = new Keyboard();
 document
   .querySelector('body')
-  .insertAdjacentHTML('afterbegin', keyboard.render());
+  .insertAdjacentHTML('afterbegin', keyboard.makeKeyboardHTML());
 
-Keyboard.setLang();
+keyboard.setLang();
 keyboard.addListener();

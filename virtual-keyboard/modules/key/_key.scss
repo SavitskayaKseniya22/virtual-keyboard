@@ -1,6 +1,5 @@
 .key {
   background-color: white;
-
   font-weight: 700;
   font-size: 1.5rem;
   min-width: 4rem;
@@ -25,6 +24,9 @@
     }
     &[data-value='capslock'] {
       background-color: #1982c4;
+    }
+    &[data-value='ctrl'] {
+      background-color: #8ac926;
     }
   }
   &.pressed {

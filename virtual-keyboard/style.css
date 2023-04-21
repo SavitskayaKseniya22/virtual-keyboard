@@ -93,6 +93,9 @@ body {
 .key.active[data-value=capslock] {
   background-color: #1982c4;
 }
+.key.active[data-value=ctrl] {
+  background-color: #8ac926;
+}
 .key.pressed {
   animation-name: press;
   animation-duration: 0.3s;
