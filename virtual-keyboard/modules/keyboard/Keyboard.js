@@ -302,8 +302,12 @@ export default class Keyboard {
     const textArea = document.getElementById('text');
     let valueToConcat = keyName;
 
-    if (this.isShiftActive !== this.isCapsActive) {
+    if (this.isShiftActive && !this.isCapsActive) {
       valueToConcat = addition || keyName.toUpperCase();
+    } else if (!this.isShiftActive && this.isCapsActive) {
+      valueToConcat = keyName.toUpperCase();
+    } else if (this.isShiftActive && this.isCapsActive) {
+      valueToConcat = addition || keyName;
     }
 
     textArea.value += valueToConcat;
