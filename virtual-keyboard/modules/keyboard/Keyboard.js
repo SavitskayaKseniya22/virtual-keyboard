@@ -290,15 +290,11 @@ export default class Keyboard {
     }
   }
 
-  static toggleKeyAnimation(keyName) {
-    document
-      .querySelector(`[data-value="${keyName}"]`)
-      ?.classList.add('pressed');
+  static toggleKeyAnimation(node) {
+    node.classList.add('pressed');
 
     setTimeout(() => {
-      document
-        .querySelector(`[data-value="${keyName}"]`)
-        ?.classList.remove('pressed');
+      node.classList.remove('pressed');
     }, 300);
   }
 
@@ -336,23 +332,27 @@ export default class Keyboard {
   addListener() {
     document.addEventListener('keydown', (event) => {
       event.preventDefault();
+      const order = (event.location);
+      const index = order ? order - 1 : 0;
       const key = this.transliterationLetter(event.key.toLowerCase(), event.code);
-      const target = document.querySelector(`[data-value="${key}"]`);
-
-      if (target.classList.contains('key_special')) {
-        this.applySpecialBehaviour(key);
-      } else {
-        const addition = target?.getAttribute('data-additional-value') || null;
-        this.changeTextarea(key, addition);
-        if (this.isShiftActive) {
-          this.applySpecialBehaviour('shift');
+      const target = document.querySelectorAll(`[data-value="${key}"]`)[index];
+      if (target) {
+        if (target.classList.contains('key_special')) {
+          this.applySpecialBehaviour(key);
+        } else {
+          const addition = target?.getAttribute('data-additional-value') || null;
+          this.changeTextarea(key, addition);
+          if (this.isShiftActive) {
+            this.applySpecialBehaviour('shift');
+          }
         }
+        Keyboard.toggleKeyAnimation(target);
       }
-      Keyboard.toggleKeyAnimation(key);
     });
 
     document.addEventListener('click', (event) => {
       const target = event.target.closest('.key');
+
       if (target) {
         const keyName = target.getAttribute('data-value');
         if (target.classList.contains('key_special')) {
@@ -364,7 +364,7 @@ export default class Keyboard {
             this.applySpecialBehaviour('shift');
           }
         }
-        Keyboard.toggleKeyAnimation(keyName);
+        Keyboard.toggleKeyAnimation(target);
       }
     });
   }
