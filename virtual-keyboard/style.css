@@ -84,18 +84,6 @@ body {
   background-color: #6a4c93;
   color: white;
 }
-.key.active {
-  color: white;
-}
-.key.active[data-value=shift] {
-  background-color: #ff595e;
-}
-.key.active[data-value=capslock] {
-  background-color: #1982c4;
-}
-.key.active[data-value=ctrl] {
-  background-color: #8ac926;
-}
 .key.pressed {
   animation-name: press;
   animation-duration: 0.3s;
@@ -126,6 +114,16 @@ body {
 }
 .key.key_special {
   flex-grow: 1;
+}
+.key.key_special.active {
+  color: white;
+  background-color: #8ac926;
+}
+.key.key_special.active[data-value=shift] {
+  background-color: #ff595e;
+}
+.key.key_special.active[data-value=capslock] {
+  background-color: #1982c4;
 }
 .key.key_letters, .key.key_digits {
   width: 4rem;

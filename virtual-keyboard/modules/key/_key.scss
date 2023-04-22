@@ -17,18 +17,7 @@
     background-color: #6a4c93;
     color: white;
   }
-  &.active {
-    color: white;
-    &[data-value='shift'] {
-      background-color: #ff595e;
-    }
-    &[data-value='capslock'] {
-      background-color: #1982c4;
-    }
-    &[data-value='ctrl'] {
-      background-color: #8ac926;
-    }
-  }
+
   &.pressed {
     animation-name: press;
     animation-duration: 0.3s;
@@ -64,13 +53,25 @@
 
   &.key_special {
     flex-grow: 1;
+    &.active {
+      color: white;
+      background-color: #8ac926;
+      &[data-value='shift'] {
+        background-color: #ff595e;
+      }
+      &[data-value='capslock'] {
+        background-color: #1982c4;
+      }
+    }
   }
+
   &.key_letters,
   &.key_digits {
     width: 4rem;
     height: 4rem;
     font-weight: 400;
   }
+
   &.key_space,
   &.key_enter {
     flex-grow: 15;
