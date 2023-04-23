@@ -19,13 +19,22 @@ body {
   transform: translate(-50%, -50%);
 }
 
-.keyboard-textarea {
+.textarea-container {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+}
+
+.keyboard-textarea {
+  width: auto;
+  font-family: monospace;
   height: 10rem;
   border: none;
   padding: 1rem;
   font-size: 2rem;
   resize: none;
+  overflow: auto;
 }
 .keyboard-textarea::-moz-placeholder {
   color: rgb(205, 201, 209);

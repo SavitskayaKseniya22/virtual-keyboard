@@ -20,7 +20,7 @@ export default class Keyboard {
       '-',
       '=',
       'Backspace',
-      'Del',
+      'Delete',
       '\\',
       ']',
       '[',
@@ -66,10 +66,10 @@ export default class Keyboard {
       'Space',
       'Alt',
       'Control',
-      '←',
-      '↑',
-      '↓',
-      '→',
+      'ArrowLeft',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowRight',
     ];
     this.ru = [
       'ё',
@@ -86,7 +86,7 @@ export default class Keyboard {
       '-',
       '=',
       'Backspace',
-      'Del',
+      'Delete',
       '\\',
       'ъ',
       'х',
@@ -133,10 +133,10 @@ export default class Keyboard {
       'Space',
       'Alt',
       'Control',
-      '←',
-      '↑',
-      '↓',
-      '→',
+      'ArrowLeft',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowRight',
     ];
     this.additions = [
       '~',
@@ -191,7 +191,10 @@ export default class Keyboard {
   makeKeyboardHTML() {
     return `
     <div class="keyboard-container">
-    <textarea id="text" name="text" class="keyboard-textarea" placeholder="Type something..."></textarea>
+    <div class="textarea-container">
+    <textarea id="text" name="text" class="keyboard-textarea" placeholder="Type something..." cols="60"></textarea>
+    </div>
+    
       <ul class="keyboard">
         <li class="keyboard-row">
         ${this.makeKeyArray(this.alpabet.slice(0, 14))}</li>
@@ -221,22 +224,20 @@ export default class Keyboard {
       Keyboard.updateCaseKeyboardLayout(
         this.isShiftActive !== this.isCapsActive,
       );
-      return;
-    }
-    if (keyName === 'capslock') {
+    } else if (keyName === 'capslock') {
       this.isCapsActive = !this.isCapsActive;
       Keyboard.updateCaseKeyboardLayout(
         this.isShiftActive !== this.isCapsActive,
       );
-      return;
-    }
-    if (keyName === 'control' && this.isShiftActive) {
+    } else if (keyName === 'control' && this.isShiftActive) {
       this.applySpecialBehaviour('shift');
       this.switchLang();
-    }
-    if (keyName === 'space') {
+    } else if (keyName === 'control' || keyName === 'alt') {
+      return keyName;
+    } else {
       this.changeTextarea(keyName);
     }
+    return keyName;
   }
 
   static toggleSpecialButton(keyName) {
@@ -303,11 +304,57 @@ export default class Keyboard {
 
   changeTextarea(keyName, addition = null) {
     const textArea = document.getElementById('text');
+    textArea.focus();
     let valueToConcat = keyName;
+    const simbols = {
+      space: ' ',
+      enter: '\n',
+      tab: '\t',
 
-    if (keyName === 'space') {
-      valueToConcat = ' ';
-      console.log(1111);
+    };
+
+    if (Object.keys(simbols).includes(keyName)) {
+      valueToConcat = simbols[keyName];
+    } else if (keyName === 'delete') {
+      if (textArea.selectionEnd !== 0) {
+        textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd + 1, 'end');
+      }
+
+      return;
+    } else if (keyName === 'backspace') {
+      if (textArea.selectionEnd !== 0) {
+        textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd, 'end');
+      }
+
+      return;
+    } else if (keyName === 'arrowleft') {
+      if (textArea.selectionEnd !== 0) {
+        textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd - 1, 'end');
+      }
+
+      return;
+    } else if (keyName === 'arrowup') {
+      if (textArea.selectionEnd !== 0) {
+        const shift = textArea.selectionEnd - Number(textArea.getAttribute('cols'));
+        textArea.setRangeText('', shift, shift, 'end');
+
+      }
+
+      return;
+    } else if (keyName === 'arrowdown') {
+      if (textArea.selectionEnd !== 0) {
+        const shift = Number(textArea.getAttribute('cols')) + textArea.selectionEnd;
+        textArea.setRangeText('', shift, shift, 'end');
+
+      }
+
+      return;
+    } else if (keyName === 'arrowright') {
+      if (textArea.selectionEnd !== 0) {
+        textArea.setRangeText('', textArea.selectionStart + 1, textArea.selectionEnd + 1, 'end');
+      }
+
+      return;
     } else if (this.isShiftActive && !this.isCapsActive) {
       valueToConcat = addition || keyName.toUpperCase();
     } else if (!this.isShiftActive && this.isCapsActive) {
@@ -316,7 +363,8 @@ export default class Keyboard {
       valueToConcat = addition || keyName;
     }
 
-    textArea.value += valueToConcat;
+    textArea.setRangeText(valueToConcat, textArea.selectionStart, textArea.selectionEnd, 'end');
+    textArea.scrollTop = textArea.scrollHeight;
   }
 
   transliterationLetter(keyName, keyCode = null) {
@@ -342,19 +390,15 @@ export default class Keyboard {
   addListener() {
     document.addEventListener('keydown', (event) => {
       const keyName = event.key === ' ' ? event.code : event.key;
-      console.log(keyName);
       event.preventDefault();
       const order = (event.location);
       const index = order ? order - 1 : 0;
       const key = this.transliterationLetter(keyName.toLowerCase(), event.code);
-      console.log(key);
       const target = document.querySelectorAll(`[data-value="${key}"]`)[index];
       if (target) {
         if (target.classList.contains('key_special')) {
           this.applySpecialBehaviour(key);
-          console.log(1);
         } else {
-          console.log(2);
           const addition = target?.getAttribute('data-additional-value') || null;
           this.changeTextarea(key, addition);
           if (this.isShiftActive) {
