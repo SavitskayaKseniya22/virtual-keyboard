@@ -234,6 +234,9 @@ export default class Keyboard {
       this.applySpecialBehaviour('shift');
       this.switchLang();
     }
+    if (keyName === 'space') {
+      this.changeTextarea(keyName);
+    }
   }
 
   static toggleSpecialButton(keyName) {
@@ -302,7 +305,10 @@ export default class Keyboard {
     const textArea = document.getElementById('text');
     let valueToConcat = keyName;
 
-    if (this.isShiftActive && !this.isCapsActive) {
+    if (keyName === 'space') {
+      valueToConcat = ' ';
+      console.log(1111);
+    } else if (this.isShiftActive && !this.isCapsActive) {
       valueToConcat = addition || keyName.toUpperCase();
     } else if (!this.isShiftActive && this.isCapsActive) {
       valueToConcat = keyName.toUpperCase();
@@ -335,15 +341,20 @@ export default class Keyboard {
 
   addListener() {
     document.addEventListener('keydown', (event) => {
+      const keyName = event.key === ' ' ? event.code : event.key;
+      console.log(keyName);
       event.preventDefault();
       const order = (event.location);
       const index = order ? order - 1 : 0;
-      const key = this.transliterationLetter(event.key.toLowerCase(), event.code);
+      const key = this.transliterationLetter(keyName.toLowerCase(), event.code);
+      console.log(key);
       const target = document.querySelectorAll(`[data-value="${key}"]`)[index];
       if (target) {
         if (target.classList.contains('key_special')) {
           this.applySpecialBehaviour(key);
+          console.log(1);
         } else {
+          console.log(2);
           const addition = target?.getAttribute('data-additional-value') || null;
           this.changeTextarea(key, addition);
           if (this.isShiftActive) {
