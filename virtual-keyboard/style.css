@@ -34,6 +34,7 @@ body {
   padding: 1rem;
   font-size: 2rem;
   resize: none;
+  outline: none;
   overflow: auto;
 }
 .keyboard-textarea::-moz-placeholder {

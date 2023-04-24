@@ -210,7 +210,7 @@ export default class Keyboard {
     </div>
     <p class="keyboard-addition">
    <b><span class="keyboard-addition__lang">${this.lang}</span></b>
-    <br> Press Shift + Control to change language</p>`;
+    <br> Press Shift + Ctrl to change language</p>`;
   }
 
   applySpecialBehaviour(keyName) {
@@ -221,9 +221,8 @@ export default class Keyboard {
   makeSpecialAction(keyName) {
     if (keyName === 'shift') {
       this.isShiftActive = !this.isShiftActive;
-      Keyboard.updateCaseKeyboardLayout(
-        this.isShiftActive !== this.isCapsActive,
-      );
+      Keyboard.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
+      Keyboard.updateDigitsKeyboardLayout();
     } else if (keyName === 'capslock') {
       this.isCapsActive = !this.isCapsActive;
       Keyboard.updateCaseKeyboardLayout(
@@ -255,13 +254,29 @@ export default class Keyboard {
     });
   }
 
-  static updateCaseKeyboardLayout(trigger) {
+  static updateCaseKeyboardLayout(triggerCase) {
     const letters = document.querySelectorAll('.key_letters');
     letters.forEach((elem) => {
       const value = elem.getAttribute('data-value');
-      const changedValue = trigger ? value.toUpperCase() : value.toLowerCase();
+      const changedValue = triggerCase ? value.toUpperCase() : value.toLowerCase();
       const elemToChange = elem.querySelector('.key-main-value');
       elemToChange.innerText = changedValue;
+    });
+  }
+
+  static updateDigitsKeyboardLayout() {
+    const digits = document.querySelectorAll('.key_digits');
+    digits.forEach((elem) => {
+      const value = elem.getAttribute('data-value');
+      if (value !== 'ё') {
+        const addition = elem.getAttribute('data-additional-value');
+        elem.setAttribute('data-value', addition);
+        elem.setAttribute('data-additional-value', value);
+        const mainElemToChange = elem.querySelector('.key-main-value');
+        mainElemToChange.innerText = addition;
+        const addElemToChange = elem.querySelector('.key-addition-value');
+        addElemToChange.innerText = value;
+      }
     });
   }
 
@@ -302,7 +317,7 @@ export default class Keyboard {
     }, 300);
   }
 
-  changeTextarea(keyName, addition = null) {
+  changeTextarea(keyName) {
     const textArea = document.getElementById('text');
     textArea.focus();
     let valueToConcat = keyName;
@@ -337,7 +352,6 @@ export default class Keyboard {
       if (textArea.selectionEnd !== 0) {
         const shift = textArea.selectionEnd - Number(textArea.getAttribute('cols'));
         textArea.setRangeText('', shift, shift, 'end');
-
       }
 
       return;
@@ -345,7 +359,6 @@ export default class Keyboard {
       if (textArea.selectionEnd !== 0) {
         const shift = Number(textArea.getAttribute('cols')) + textArea.selectionEnd;
         textArea.setRangeText('', shift, shift, 'end');
-
       }
 
       return;
@@ -355,12 +368,8 @@ export default class Keyboard {
       }
 
       return;
-    } else if (this.isShiftActive && !this.isCapsActive) {
-      valueToConcat = addition || keyName.toUpperCase();
-    } else if (!this.isShiftActive && this.isCapsActive) {
+    } else if (this.isShiftActive !== this.isCapsActive) {
       valueToConcat = keyName.toUpperCase();
-    } else if (this.isShiftActive && this.isCapsActive) {
-      valueToConcat = addition || keyName;
     }
 
     textArea.setRangeText(valueToConcat, textArea.selectionStart, textArea.selectionEnd, 'end');
@@ -399,8 +408,7 @@ export default class Keyboard {
         if (target.classList.contains('key_special')) {
           this.applySpecialBehaviour(key);
         } else {
-          const addition = target?.getAttribute('data-additional-value') || null;
-          this.changeTextarea(key, addition);
+          this.changeTextarea(key);
           if (this.isShiftActive) {
             this.applySpecialBehaviour('shift');
           }
@@ -417,8 +425,7 @@ export default class Keyboard {
         if (target.classList.contains('key_special')) {
           this.applySpecialBehaviour(keyName);
         } else {
-          const addition = target.getAttribute('data-additional-value');
-          this.changeTextarea(keyName, addition);
+          this.changeTextarea(keyName);
           if (this.isShiftActive) {
             this.applySpecialBehaviour('shift');
           }
