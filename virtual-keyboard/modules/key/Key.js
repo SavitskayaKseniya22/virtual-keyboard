@@ -2,32 +2,27 @@ export default class Key {
   constructor(keyObject) {
     this.value = keyObject.value;
     this.secondValue = keyObject.secondValue;
-    this.addition = keyObject.addition || '';
-    this.isSpecial = keyObject.isSpecial;
+    this.addition = keyObject.addition;
+    this.shortcut = keyObject.shortcut;
+    this.dataset = `data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" ${this.addition ? `data-additional-value="${this.addition}"` : ''}`;
+    this.classList = Key.makeClassList(this.value);
+  }
+
+  static makeClassList(value) {
+    let classList = 'key';
+    if (value.length > 1) {
+      classList += ` key_special key_${value.toLowerCase()}`;
+    } else {
+      classList += /^[0-9-=\\]$/.test(value) ? ' key_digits' : ' key_letters';
+    }
+    classList += value === '`' ? ' key_digits' : '';
+    return classList;
   }
 
   makeKeyHTML() {
-    const shortCuts = {
-      Control: 'Ctrl',
-      Delete: 'Del',
-      ArrowLeft: '←',
-      ArrowRight: '→',
-      ArrowUp: '↑',
-      ArrowDown: '↓',
-    };
-    let className = 'key';
-    if (this.isSpecial) {
-      className += ' key_special';
-    } else {
-      className += /^[0-9-=\\]$/.test(this.value) ? ' key_digits' : ' key_letters';
-    }
-    className += this.value === 'Space' ? ' key_space' : '';
-    className += this.value === 'Enter' ? ' key_enter' : '';
-    className += this.value === '`' ? ' key_digits' : '';
-
-    return `<div data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" data-additional-value="${this.addition}" class="${className}">
-      <span class="key-main-value">${shortCuts[this.value] || this.value}</span
-      ><span class="key-addition-value">${this.addition}</span>
+    return `<div ${this.dataset} class="${this.classList}">
+      <span class="key-main-value">${this.shortcut || this.value}</span
+      >${this.addition ? `<span class="key-addition-value">${this.addition}</span>` : ''}
     </div>`;
   }
 }
