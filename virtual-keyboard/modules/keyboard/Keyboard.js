@@ -1,177 +1,17 @@
 /* eslint-disable import/extensions */
 import Key from '../key/Key.js';
+import buttons from '../../assets/buttons.json' assert { type: "json" };
+import alphabet from "../../assets/scripts/utilities.js";
+
+
 
 export default class Keyboard {
   constructor() {
     this.lang = window.localStorage.getItem('lang') || 'ENG';
-
-    this.eng = [
-      '`',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '0',
-      '-',
-      '=',
-      'Backspace',
-      'Delete',
-      '\\',
-      ']',
-      '[',
-      'p',
-      'o',
-      'i',
-      'u',
-      'y',
-      't',
-      'r',
-      'e',
-      'w',
-      'q',
-      'Tab',
-      'CapsLock',
-      'a',
-      's',
-      'd',
-      'f',
-      'g',
-      'h',
-      'j',
-      'k',
-      'l',
-      ';',
-      "'",
-      'Enter',
-      'Shift',
-      '/',
-      '.',
-      ',',
-      'm',
-      'n',
-      'b',
-      'v',
-      'c',
-      'x',
-      'z',
-      'Shift',
-      'Control',
-      'Win',
-      'Alt',
-      'Space',
-      'Alt',
-      'Control',
-      'ArrowLeft',
-      'ArrowUp',
-      'ArrowDown',
-      'ArrowRight',
-    ];
-    this.ru = [
-      'ё',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '0',
-      '-',
-      '=',
-      'Backspace',
-      'Delete',
-      '\\',
-      'ъ',
-      'х',
-      'з',
-      'щ',
-      'ш',
-      'г',
-      'н',
-      'е',
-      'к',
-      'у',
-      'ц',
-      'й',
-      'Tab',
-      'CapsLock',
-      'ф',
-      'ы',
-      'в',
-      'а',
-      'п',
-      'р',
-      'о',
-      'л',
-      'д',
-      'ж',
-      'э',
-      'Enter',
-      'Shift',
-      '.',
-      'ю',
-      'б',
-      'ь',
-      'т',
-      'и',
-      'м',
-      'с',
-      'ч',
-      'я',
-
-      'Shift',
-      'Control',
-      'Win',
-      'Alt',
-      'Space',
-      'Alt',
-      'Control',
-      'ArrowLeft',
-      'ArrowUp',
-      'ArrowDown',
-      'ArrowRight',
-    ];
-    this.additions = [
-      '~',
-      '!',
-      '@',
-      '#',
-      '$',
-      '%',
-      '^',
-      '&',
-      '*',
-      '(',
-      ')',
-      '_',
-      '+',
-      '',
-      '',
-      '/',
-    ];
-    this.alpabet = this.merge(this.eng, this.ru, this.additions);
+    this.alpabet = buttons;
     this.isShiftActive = false;
     this.isCapsActive = false;
-  }
-
-  merge(arr, arr2, arr3) {
-    this.array = [];
-    arr.forEach((element, index) => {
-      this.array.push({
-        value: element,
-        secondValue: arr2[index],
-        addition: arr3[index] ?? null,
-        isSpecial: element.length > 1,
-      });
-    });
-    return this.array;
+    console.log(alphabet.ru)
   }
 
   makeKey(element) {
@@ -185,6 +25,7 @@ export default class Keyboard {
     array.forEach((element) => {
       this.keyboardContent.push(this.makeKey(element));
     });
+
     return this.keyboardContent.join('');
   }
 
@@ -385,13 +226,13 @@ export default class Keyboard {
       return '.';
     }
 
-    if (this.lang === 'RU' && this.eng.includes(keyName || keyName.toLowerCase())) {
-      const index = this.eng.indexOf(keyName);
-      return this.ru[index];
+    if (this.lang === 'RU' && alphabet.eng.includes(keyName || keyName.toLowerCase())) {
+      const index = alphabet.eng.indexOf(keyName);
+      return alphabet.ru[index];
     }
-    if (this.lang === 'ENG' && this.ru.includes(keyName || keyName.toLowerCase())) {
-      const index = this.ru.indexOf(keyName);
-      return this.eng[index];
+    if (this.lang === 'ENG' && alphabet.ru.includes(keyName || keyName.toLowerCase())) {
+      const index = alphabet.ru.indexOf(keyName);
+      return alphabet.eng[index];
     }
     return keyName;
   }
