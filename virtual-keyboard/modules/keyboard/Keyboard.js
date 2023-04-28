@@ -175,23 +175,27 @@ export default class Keyboard {
     } else if (this.isShiftActive !== this.isCapsActive) {
       valueToConcat = keyName.toUpperCase();
     }
+
     return valueToConcat;
   }
 
   static checkPositionToConcat(keyName, textArea) {
     let [start, end] = [textArea.selectionStart, textArea.selectionEnd];
+
     const upValue = textArea.selectionEnd - Number(textArea.getAttribute('cols')) < 0 ? 0 : textArea.selectionEnd - Number(textArea.getAttribute('cols'));
-    const downValue = Number(textArea.getAttribute('cols')) + textArea.selectionEnd > textArea.value.length ? textArea.value.length : Number(textArea.getAttribute('cols')) + textArea.selectionEnd;
     const positions = {
-      delete: [start, end] = [textArea.selectionStart, textArea.selectionEnd + 1],
-      backspace: [start, end] = [textArea.selectionStart - 1, textArea.selectionEnd],
-      arrowleft: [start, end] = [textArea.selectionStart - 1, textArea.selectionEnd - 1],
-      arrowup: [start, end] = [upValue, upValue],
-      arrowdown: [start, end] = [downValue, downValue],
-      arrowright: [start, end] = [textArea.selectionStart + 1, textArea.selectionEnd + 1],
+      delete: [textArea.selectionStart, textArea.selectionEnd + 1],
+      backspace: [textArea.selectionStart - 1, textArea.selectionEnd],
+      arrowleft: [textArea.selectionStart - 1, textArea.selectionEnd - 1],
+      arrowup: [upValue, upValue],
+      arrowdown: [Number(textArea.getAttribute('cols')) + textArea.selectionEnd, Number(textArea.getAttribute('cols')) + textArea.selectionEnd],
+      arrowright: [textArea.selectionStart + 1, textArea.selectionEnd + 1],
     };
 
-    if (textArea.selectionEnd !== 0 && positions[keyName]) {
+    if (positions[keyName]) {
+      if ((keyName === 'backspace' || keyName === 'arrowleft' || keyName === 'arrowup') && textArea.selectionEnd === 0) {
+        return [start, end];
+      }
       [start, end] = positions[keyName];
     }
 
@@ -235,6 +239,7 @@ export default class Keyboard {
       const index = order ? order - 1 : 0;
       const key = this.transliterationLetter(keyName.toLowerCase(), event.code);
       const target = document.querySelectorAll(`[data-value="${key}"]`)[index];
+
       if (target) {
         if (target.classList.contains('key_special')) {
           this.applySpecialBehaviour(key);
