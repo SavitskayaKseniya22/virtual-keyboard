@@ -228,6 +228,7 @@ export default class Keyboard {
       const index = alphabet.ru.indexOf(keyName);
       return alphabet.eng[index];
     }
+
     return keyName;
   }
 
@@ -237,8 +238,13 @@ export default class Keyboard {
       event.preventDefault();
       const order = (event.location);
       const index = order ? order - 1 : 0;
-      const key = this.transliterationLetter(keyName.toLowerCase(), event.code);
-      const target = document.querySelectorAll(`[data-value="${key}"]`)[index];
+      let key = this.transliterationLetter(keyName.toLowerCase(), event.code);
+      let target = document.querySelectorAll(`[data-value="${key}"]`)[index];
+
+      if (!target && this.isShiftActive) {
+        target = document.querySelectorAll(`[data-additional-value="${key}"]`)[index];
+        key = target?.getAttribute('data-value');
+      }
 
       if (target) {
         if (target.classList.contains('key_special')) {
