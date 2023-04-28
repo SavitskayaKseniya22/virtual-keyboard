@@ -1,9 +1,8 @@
 /* eslint-disable import/extensions */
+/* eslint-disable no-multi-assign */
 import Key from '../key/Key.js';
-import buttons from '../../assets/buttons.json' assert { type: "json" };
-import alphabet from "../../assets/scripts/utilities.js";
-
-
+import buttons from '../../assets/buttons.js';
+import alphabet from '../../assets/scripts/utilities.js';
 
 export default class Keyboard {
   constructor() {
@@ -11,7 +10,6 @@ export default class Keyboard {
     this.alpabet = buttons;
     this.isShiftActive = false;
     this.isCapsActive = false;
-    console.log(alphabet.ru)
   }
 
   makeKey(element) {
@@ -158,62 +156,54 @@ export default class Keyboard {
     }, 300);
   }
 
-  changeTextarea(keyName) {
-    const textArea = document.getElementById('text');
-    textArea.focus();
+  checkValueToConcat(keyName) {
     let valueToConcat = keyName;
     const simbols = {
       space: ' ',
       enter: '\n',
       tab: '\t',
-
+      delete: '',
+      backspace: '',
+      arrowleft: '',
+      arrowup: '',
+      arrowdown: '',
+      arrowright: '',
     };
 
     if (Object.keys(simbols).includes(keyName)) {
       valueToConcat = simbols[keyName];
-    } else if (keyName === 'delete') {
-      if (textArea.selectionEnd !== 0) {
-        textArea.setRangeText('', textArea.selectionStart, textArea.selectionEnd + 1, 'end');
-      }
-
-      return;
-    } else if (keyName === 'backspace') {
-      if (textArea.selectionEnd !== 0) {
-        textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd, 'end');
-      }
-
-      return;
-    } else if (keyName === 'arrowleft') {
-      if (textArea.selectionEnd !== 0) {
-        textArea.setRangeText('', textArea.selectionStart - 1, textArea.selectionEnd - 1, 'end');
-      }
-
-      return;
-    } else if (keyName === 'arrowup') {
-      if (textArea.selectionEnd !== 0) {
-        const shift = textArea.selectionEnd - Number(textArea.getAttribute('cols'));
-        textArea.setRangeText('', shift, shift, 'end');
-      }
-
-      return;
-    } else if (keyName === 'arrowdown') {
-      if (textArea.selectionEnd !== 0) {
-        const shift = Number(textArea.getAttribute('cols')) + textArea.selectionEnd;
-        textArea.setRangeText('', shift, shift, 'end');
-      }
-
-      return;
-    } else if (keyName === 'arrowright') {
-      if (textArea.selectionEnd !== 0) {
-        textArea.setRangeText('', textArea.selectionStart + 1, textArea.selectionEnd + 1, 'end');
-      }
-
-      return;
     } else if (this.isShiftActive !== this.isCapsActive) {
       valueToConcat = keyName.toUpperCase();
     }
+    return valueToConcat;
+  }
 
-    textArea.setRangeText(valueToConcat, textArea.selectionStart, textArea.selectionEnd, 'end');
+  static checkPositionToConcat(keyName, textArea) {
+    let [start, end] = [textArea.selectionStart, textArea.selectionEnd];
+    const upValue = textArea.selectionEnd - Number(textArea.getAttribute('cols')) < 0 ? 0 : textArea.selectionEnd - Number(textArea.getAttribute('cols'));
+    const downValue = Number(textArea.getAttribute('cols')) + textArea.selectionEnd > textArea.value.length ? textArea.value.length : Number(textArea.getAttribute('cols')) + textArea.selectionEnd;
+    const positions = {
+      delete: [start, end] = [textArea.selectionStart, textArea.selectionEnd + 1],
+      backspace: [start, end] = [textArea.selectionStart - 1, textArea.selectionEnd],
+      arrowleft: [start, end] = [textArea.selectionStart - 1, textArea.selectionEnd - 1],
+      arrowup: [start, end] = [upValue, upValue],
+      arrowdown: [start, end] = [downValue, downValue],
+      arrowright: [start, end] = [textArea.selectionStart + 1, textArea.selectionEnd + 1],
+    };
+
+    if (textArea.selectionEnd !== 0 && positions[keyName]) {
+      [start, end] = positions[keyName];
+    }
+
+    return [start, end];
+  }
+
+  changeTextarea(keyName) {
+    const textArea = document.getElementById('text');
+    textArea.focus();
+    const valueToConcat = this.checkValueToConcat(keyName);
+    const [start, end] = Keyboard.checkPositionToConcat(keyName, textArea);
+    textArea.setRangeText(valueToConcat, start, end, 'end');
     textArea.scrollTop = textArea.scrollHeight;
   }
 
