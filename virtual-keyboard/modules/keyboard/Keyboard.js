@@ -155,7 +155,7 @@ export default class Keyboard {
 
     if (value !== undefined) {
       valueToConcat = value;
-    } else if (addition !== undefined && (this.isShiftActive !== this.isCapsActive)) {
+    } else if (addition !== undefined && (this.isShiftActive)) {
       valueToConcat = addition;
     } else if (this.isShiftActive !== this.isCapsActive) {
       valueToConcat = keyName.toUpperCase();
