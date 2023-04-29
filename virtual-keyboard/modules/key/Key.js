@@ -1,9 +1,10 @@
 export default class Key {
-  constructor(keyObject) {
-    this.value = keyObject.value;
-    this.secondValue = keyObject.secondValue;
-    this.addition = keyObject.addition;
-    this.shortcut = keyObject.shortcut;
+  constructor(key, object, lang) {
+    this.keyObject = object[key];
+    this.value = lang === 'RU' ? this.keyObject.ru : this.keyObject.eng;
+    this.secondValue = lang === 'RU' ? this.keyObject.eng : this.keyObject.ru;
+    this.addition = this.keyObject.addition;
+    this.shortcut = this.keyObject.shortcut;
     this.dataset = `data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" ${this.addition ? `data-additional-value="${this.addition}"` : ''}`;
     this.classList = Key.makeClassList(this.value);
   }

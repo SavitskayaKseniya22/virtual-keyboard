@@ -1,27 +1,27 @@
 /* eslint-disable import/extensions */
-/* eslint-disable no-multi-assign */
+
 import Key from '../key/Key.js';
-import buttons from '../../assets/buttons.js';
 import alphabet from '../../assets/scripts/utilities.js';
 
 export default class Keyboard {
   constructor() {
     this.lang = window.localStorage.getItem('lang') || 'ENG';
-    this.alpabet = buttons;
+    this.keyCodes = alphabet.codes;
+    this.keyDescriptions = alphabet.merge();
     this.isShiftActive = false;
     this.isCapsActive = false;
   }
 
-  makeKey(element) {
-    const key = new Key(element);
+  makeKey(element, object, lang) {
+    const key = new Key(element, object, lang);
     this.keyContent = key.makeKeyHTML();
     return this.keyContent;
   }
 
-  makeKeyArray(array) {
+  makeKeyArray(array, object, lang) {
     this.keyboardContent = [];
     array.forEach((element) => {
-      this.keyboardContent.push(this.makeKey(element));
+      this.keyboardContent.push(this.makeKey(element, object, lang));
     });
 
     return this.keyboardContent.join('');
@@ -36,15 +36,15 @@ export default class Keyboard {
     
       <ul class="keyboard">
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.alpabet.slice(0, 14))}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(0, 14), this.keyDescriptions, this.lang)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.alpabet.slice(14, 29).reverse())}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(14, 29).reverse(), this.keyDescriptions, this.lang)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.alpabet.slice(29, 42))}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(29, 42), this.keyDescriptions, this.lang)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.alpabet.slice(42, 54).reverse())}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(42, 54).reverse(), this.keyDescriptions, this.lang)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.alpabet.slice(54, this.alpabet.length))}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(54, this.keyCodes.length), this.keyDescriptions, this.lang)}</li>
       </ul>
     </div>
     <p class="keyboard-addition">
@@ -142,12 +142,6 @@ export default class Keyboard {
     document.querySelector('.keyboard-addition__lang').innerText = langValue;
   }
 
-  setLang() {
-    if (this.lang === 'RU') {
-      Keyboard.updateLangKeyboardLayout();
-    }
-  }
-
   static toggleKeyAnimation(node) {
     node.classList.add('pressed');
 
@@ -168,6 +162,7 @@ export default class Keyboard {
       arrowup: '',
       arrowdown: '',
       arrowright: '',
+
     };
 
     if (Object.keys(simbols).includes(keyName)) {

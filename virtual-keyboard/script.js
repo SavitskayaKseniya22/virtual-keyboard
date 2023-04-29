@@ -6,5 +6,4 @@ document
   .querySelector('body')
   .insertAdjacentHTML('afterbegin', keyboard.makeKeyboardHTML());
 
-keyboard.setLang();
 keyboard.addListener();
