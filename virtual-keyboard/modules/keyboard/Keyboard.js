@@ -60,11 +60,11 @@ export default class Keyboard {
   makeSpecialAction(keyName, code) {
     if (keyName === 'Shift') {
       this.isShiftActive = !this.isShiftActive;
-      Keyboard.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
+      this.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
       this.updateDigitsKeyboardLayout();
     } else if (keyName === 'CapsLock') {
       this.isCapsActive = !this.isCapsActive;
-      Keyboard.updateCaseKeyboardLayout(
+      this.updateCaseKeyboardLayout(
         this.isShiftActive !== this.isCapsActive,
       );
     } else if (keyName === 'Control' && this.isShiftActive) {
@@ -91,11 +91,12 @@ export default class Keyboard {
     });
   }
 
-  static updateCaseKeyboardLayout(triggerCase) {
+  updateCaseKeyboardLayout(triggerCase) {
     const letters = document.querySelectorAll('.key_letters');
     letters.forEach((elem) => {
-      const value = elem.getAttribute('data-value');
-      const changedValue = triggerCase ? value.toUpperCase() : value.toLowerCase();
+      const code = elem.getAttribute('data-code');
+      const valueToChange = this.lang === 'ENG' ? this.keyDescriptions[code].eng : this.keyDescriptions[code].ru;
+      const changedValue = triggerCase ? valueToChange.toUpperCase() : valueToChange.toLowerCase();
       const elemToChange = elem.querySelector('.key-main-value');
       elemToChange.innerText = changedValue;
     });
