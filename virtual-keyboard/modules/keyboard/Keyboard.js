@@ -49,7 +49,7 @@ export default class Keyboard {
     </div>
     <p class="keyboard-addition">
    <b><span class="keyboard-addition__lang">${this.lang}</span></b>
-    <br> Press Shift + Ctrl to change language</p>`;
+    <br> Press Shift and then Ctrl to change language</p>`;
   }
 
   applySpecialBehaviour(keyName) {
@@ -58,19 +58,19 @@ export default class Keyboard {
   }
 
   makeSpecialAction(keyName) {
-    if (keyName === 'shift') {
+    if (keyName === 'Shift') {
       this.isShiftActive = !this.isShiftActive;
       Keyboard.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
       Keyboard.updateDigitsKeyboardLayout();
-    } else if (keyName === 'capslock') {
+    } else if (keyName === 'CapsLock') {
       this.isCapsActive = !this.isCapsActive;
       Keyboard.updateCaseKeyboardLayout(
         this.isShiftActive !== this.isCapsActive,
       );
-    } else if (keyName === 'control' && this.isShiftActive) {
-      this.applySpecialBehaviour('shift');
+    } else if (keyName === 'Control' && this.isShiftActive) {
+      this.applySpecialBehaviour('Shift');
       this.switchLang();
-    } else if (keyName === 'control' || keyName === 'alt') {
+    } else if (keyName === 'Control' || keyName === 'Alt') {
       return keyName;
     } else {
       this.changeTextarea(keyName);
@@ -83,7 +83,7 @@ export default class Keyboard {
     keys.forEach((element) => {
       element.classList.toggle('active');
 
-      if (keyName === 'shift' || keyName === 'capslock') {
+      if (keyName === 'Shift' || keyName === 'CapsLock') {
         return;
       }
 
@@ -152,21 +152,8 @@ export default class Keyboard {
 
   checkValueToConcat(keyName) {
     let valueToConcat = keyName;
-    const simbols = {
-      space: ' ',
-      enter: '\n',
-      tab: '\t',
-      delete: '',
-      backspace: '',
-      arrowleft: '',
-      arrowup: '',
-      arrowdown: '',
-      arrowright: '',
-
-    };
-
-    if (Object.keys(simbols).includes(keyName)) {
-      valueToConcat = simbols[keyName];
+    if (this.keyDescriptions[keyName]?.value !== undefined) {
+      valueToConcat = this.keyDescriptions[keyName].value;
     } else if (this.isShiftActive !== this.isCapsActive) {
       valueToConcat = keyName.toUpperCase();
     }
@@ -179,16 +166,16 @@ export default class Keyboard {
 
     const upValue = textArea.selectionEnd - Number(textArea.getAttribute('cols')) < 0 ? 0 : textArea.selectionEnd - Number(textArea.getAttribute('cols'));
     const positions = {
-      delete: [textArea.selectionStart, textArea.selectionEnd + 1],
-      backspace: [textArea.selectionStart - 1, textArea.selectionEnd],
-      arrowleft: [textArea.selectionStart - 1, textArea.selectionEnd - 1],
-      arrowup: [upValue, upValue],
-      arrowdown: [Number(textArea.getAttribute('cols')) + textArea.selectionEnd, Number(textArea.getAttribute('cols')) + textArea.selectionEnd],
-      arrowright: [textArea.selectionStart + 1, textArea.selectionEnd + 1],
+      Delete: [textArea.selectionStart, textArea.selectionEnd + 1],
+      Backspace: [textArea.selectionStart - 1, textArea.selectionEnd],
+      ArrowLeft: [textArea.selectionStart - 1, textArea.selectionEnd - 1],
+      ArrowUp: [upValue, upValue],
+      ArrowDown: [Number(textArea.getAttribute('cols')) + textArea.selectionEnd, Number(textArea.getAttribute('cols')) + textArea.selectionEnd],
+      ArrowRight: [textArea.selectionStart + 1, textArea.selectionEnd + 1],
     };
 
     if (positions[keyName]) {
-      if ((keyName === 'backspace' || keyName === 'arrowleft' || keyName === 'arrowup') && textArea.selectionEnd === 0) {
+      if ((keyName === 'Backspace' || keyName === 'ArrowLeft' || keyName === 'ArrowUp') && textArea.selectionEnd === 0) {
         return [start, end];
       }
       [start, end] = positions[keyName];
@@ -216,16 +203,17 @@ export default class Keyboard {
       if (this.keyDescriptions[event.code]) {
         let key = Keyboard.chooseLangForKey(this.keyDescriptions[event.code], this.lang);
         const target = document.querySelector(`[data-code="${event.code}"]`);
-        if (this.isShiftActive && this.keyDescriptions[event.code].addition) {
+        if (this.isShiftActive && this.keyDescriptions[event.code].addition && !(event.code === 'Backquote' && this.lang === 'RU')) {
           key = this.keyDescriptions[event.code].addition;
         }
+
         if (target) {
           if (target.classList.contains('key_special')) {
             this.applySpecialBehaviour(key);
           } else {
             this.changeTextarea(key);
             if (this.isShiftActive) {
-              this.applySpecialBehaviour('shift');
+              this.applySpecialBehaviour('Shift');
             }
           }
           Keyboard.toggleKeyAnimation(target);
@@ -243,7 +231,7 @@ export default class Keyboard {
         } else {
           this.changeTextarea(keyName);
           if (this.isShiftActive) {
-            this.applySpecialBehaviour('shift');
+            this.applySpecialBehaviour('Shift');
           }
         }
         Keyboard.toggleKeyAnimation(target);

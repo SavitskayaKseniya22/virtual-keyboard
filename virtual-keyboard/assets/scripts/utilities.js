@@ -237,8 +237,10 @@ export default {
     array.splice(60, 0, '');
     array.splice(61, 0, '');
     array.splice(62, 0, '');
+
     return (array);
   },
+
   merge() {
     const shortcut = this.makeShortcut();
     const values = this.makeValueToConcat();

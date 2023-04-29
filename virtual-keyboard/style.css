@@ -129,10 +129,10 @@ body {
   color: white;
   background-color: #8ac926;
 }
-.key.key_special.active[data-value=shift] {
+.key.key_special.active.key_shift {
   background-color: #ff595e;
 }
-.key.key_special.active[data-value=capslock] {
+.key.key_special.active.key_capslock {
   background-color: #1982c4;
 }
 .key.key_letters, .key.key_digits {
