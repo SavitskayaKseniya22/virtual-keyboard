@@ -232,7 +232,11 @@ export default {
     array.splice(14, 0, '');
     array.splice(28, 0, '\t');
     array.splice(41, 0, '\n');
+    array.splice(54, 0, '');
+    array.splice(55, 0, '');
     array.splice(56, 0, ' ');
+    array.splice(57, 0, '');
+    array.splice(58, 0, '');
     array.splice(59, 0, '');
     array.splice(60, 0, '');
     array.splice(61, 0, '');
