@@ -5,7 +5,7 @@ export default class Key {
     this.secondValue = lang === 'RU' ? this.keyObject.eng : this.keyObject.ru;
     this.addition = this.keyObject.addition;
     this.shortcut = this.keyObject.shortcut;
-    this.dataset = `data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" ${this.addition ? `data-additional-value="${this.addition}"` : ''}`;
+    this.dataset = ` data-code="${key}"  data-value="${this.value.toLowerCase()}" data-second-value="${this.secondValue.toLowerCase()}" ${this.addition ? `data-additional-value="${this.addition}"` : ''}`;
     this.classList = Key.makeClassList(this.value);
   }
 

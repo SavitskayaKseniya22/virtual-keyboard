@@ -206,51 +206,30 @@ export default class Keyboard {
     textArea.scrollTop = textArea.scrollHeight;
   }
 
-  transliterationLetter(keyName, keyCode = null) {
-    if (
-      keyName === '.'
-      && ((this.lang === 'ENG' && keyCode === 'Period')
-        || (this.lang === 'RU' && keyCode === 'Slash'))
-    ) {
-      return '.';
-    }
-
-    if (this.lang === 'RU' && alphabet.eng.includes(keyName || keyName.toLowerCase())) {
-      const index = alphabet.eng.indexOf(keyName);
-      return alphabet.ru[index];
-    }
-    if (this.lang === 'ENG' && alphabet.ru.includes(keyName || keyName.toLowerCase())) {
-      const index = alphabet.ru.indexOf(keyName);
-      return alphabet.eng[index];
-    }
-
-    return keyName;
+  static chooseLangForKey(object, lang) {
+    return object[lang.toLowerCase()];
   }
 
   addListener() {
     document.addEventListener('keydown', (event) => {
-      const keyName = event.key === ' ' ? event.code : event.key;
       event.preventDefault();
-      const order = (event.location);
-      const index = order ? order - 1 : 0;
-      let key = this.transliterationLetter(keyName.toLowerCase(), event.code);
-      let target = document.querySelectorAll(`[data-value="${key}"]`)[index];
-
-      if (!target && this.isShiftActive) {
-        target = document.querySelectorAll(`[data-additional-value="${key}"]`)[index];
-        key = target?.getAttribute('data-value');
-      }
-
-      if (target) {
-        if (target.classList.contains('key_special')) {
-          this.applySpecialBehaviour(key);
-        } else {
-          this.changeTextarea(key);
-          if (this.isShiftActive) {
-            this.applySpecialBehaviour('shift');
-          }
+      if (this.keyDescriptions[event.code]) {
+        let key = Keyboard.chooseLangForKey(this.keyDescriptions[event.code], this.lang);
+        const target = document.querySelector(`[data-code="${event.code}"]`);
+        if (this.isShiftActive && this.keyDescriptions[event.code].addition) {
+          key = this.keyDescriptions[event.code].addition;
         }
-        Keyboard.toggleKeyAnimation(target);
+        if (target) {
+          if (target.classList.contains('key_special')) {
+            this.applySpecialBehaviour(key);
+          } else {
+            this.changeTextarea(key);
+            if (this.isShiftActive) {
+              this.applySpecialBehaviour('shift');
+            }
+          }
+          Keyboard.toggleKeyAnimation(target);
+        }
       }
     });
 
