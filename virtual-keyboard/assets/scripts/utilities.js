@@ -55,7 +55,7 @@ export default {
     'z',
     'Shift',
     'Control',
-    'Win',
+
     'Alt',
     'Space',
     'Alt',
@@ -122,7 +122,7 @@ export default {
 
     'Shift',
     'Control',
-    'Win',
+
     'Alt',
     'Space',
     'Alt',
@@ -150,4 +150,111 @@ export default {
     '',
     '/',
   ],
+  codes: [
+    'Backquote',
+    'Digit1',
+    'Digit2',
+    'Digit3',
+    'Digit4',
+    'Digit5',
+    'Digit6',
+    'Digit7',
+    'Digit8',
+    'Digit9',
+    'Digit0',
+    'Minus',
+    'Equal',
+    'Backspace',
+    'Delete',
+    'Backslash',
+    'BracketRight',
+    'BracketLeft',
+    'KeyP',
+    'KeyO',
+    'KeyI',
+    'KeyU',
+    'KeyY',
+    'KeyT',
+    'KeyR',
+    'KeyE',
+    'KeyW',
+    'KeyQ',
+    'Tab',
+    'CapsLock',
+    'KeyA',
+    'KeyS',
+    'KeyD',
+    'KeyF',
+    'KeyG',
+    'KeyH',
+    'KeyJ',
+    'KeyK',
+    'KeyL',
+    'Semicolon',
+    'Quote',
+    'Enter',
+    'ShiftRight',
+    'Slash',
+    'Period',
+    'Comma',
+    'KeyM',
+    'KeyN',
+    'KeyB',
+    'KeyV',
+    'KeyC',
+    'KeyX',
+    'KeyZ',
+    'ShiftLeft',
+    'ControlLeft',
+    'AltLeft',
+    'Space',
+    'AltRight',
+    'ControlRight',
+    'ArrowLeft',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowRight',
+  ],
+  makeShortcut() {
+    const array = new Array(63);
+    array.splice(14, 0, 'Del');
+    array.splice(54, 0, 'Ctrl');
+    array.splice(58, 0, 'Ctrl');
+    array.splice(59, 0, '←');
+    array.splice(60, 0, '↑');
+    array.splice(61, 0, '↓');
+    array.splice(62, 0, '→');
+    return (array);
+  },
+  makeValueToConcat() {
+    const array = new Array(63);
+    array.splice(13, 0, '');
+    array.splice(14, 0, '');
+    array.splice(28, 0, '\t');
+    array.splice(41, 0, '\n');
+    array.splice(56, 0, ' ');
+    array.splice(59, 0, '');
+    array.splice(60, 0, '');
+    array.splice(61, 0, '');
+    array.splice(62, 0, '');
+    return (array);
+  },
+  merge() {
+    const shortcut = this.makeShortcut();
+    const values = this.makeValueToConcat();
+    const object = {};
+    this.codes.forEach((element, index) => {
+      object[element] = {
+        ru: this.ru[index],
+        eng: this.eng[index],
+        addition: this.additions[index],
+        shortcut: shortcut[index],
+        value: values[index],
+        index,
+
+      };
+    });
+
+    return object;
+  },
 };
