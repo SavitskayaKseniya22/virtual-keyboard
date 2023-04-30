@@ -1,5 +1,3 @@
-/* eslint-disable import/extensions */
-
 import Key from '../key/Key.js';
 import alphabet from '../../assets/scripts/utilities.js';
 
@@ -170,7 +168,6 @@ export default class Keyboard {
 
   static checkPositionToConcat(keyName, textArea) {
     let [start, end] = [textArea.selectionStart, textArea.selectionEnd];
-
     const upValue = textArea.selectionEnd - Number(textArea.getAttribute('cols')) < 0 ? 0 : textArea.selectionEnd - Number(textArea.getAttribute('cols'));
     const positions = {
       Delete: [textArea.selectionStart, textArea.selectionEnd + 1],
