@@ -245,12 +245,13 @@ export default {
     return (array);
   },
 
-  merge() {
+  merge(lang) {
     const shortcut = this.makeShortcut();
     const values = this.makeValueToConcat();
     const object = {};
     this.codes.forEach((element, index) => {
       object[element] = {
+        activeValue: lang === 'RU' ? this.ru[index] : this.eng[index],
         ru: this.ru[index],
         eng: this.eng[index],
         addition: this.additions[index],

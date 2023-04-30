@@ -7,21 +7,21 @@ export default class Keyboard {
   constructor() {
     this.lang = window.localStorage.getItem('lang') || 'ENG';
     this.keyCodes = alphabet.codes;
-    this.keyDescriptions = alphabet.merge();
+    this.keyDescriptions = alphabet.merge(this.lang);
     this.isShiftActive = false;
     this.isCapsActive = false;
   }
 
-  makeKey(element, object, lang) {
-    const key = new Key(element, object, lang);
+  makeKey(element, object) {
+    const key = new Key(element, object);
     this.keyContent = key.makeKeyHTML();
     return this.keyContent;
   }
 
-  makeKeyArray(array, object, lang) {
+  makeKeyArray(array, object) {
     this.keyboardContent = [];
     array.forEach((element) => {
-      this.keyboardContent.push(this.makeKey(element, object, lang));
+      this.keyboardContent.push(this.makeKey(element, object));
     });
 
     return this.keyboardContent.join('');
@@ -36,15 +36,15 @@ export default class Keyboard {
     
       <ul class="keyboard">
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.keyCodes.slice(0, 14), this.keyDescriptions, this.lang)}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(0, 14), this.keyDescriptions)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.keyCodes.slice(14, 29).reverse(), this.keyDescriptions, this.lang)}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(14, 29).reverse(), this.keyDescriptions)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.keyCodes.slice(29, 42), this.keyDescriptions, this.lang)}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(29, 42), this.keyDescriptions)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.keyCodes.slice(42, 54).reverse(), this.keyDescriptions, this.lang)}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(42, 54).reverse(), this.keyDescriptions)}</li>
         <li class="keyboard-row">
-        ${this.makeKeyArray(this.keyCodes.slice(54, this.keyCodes.length), this.keyDescriptions, this.lang)}</li>
+        ${this.makeKeyArray(this.keyCodes.slice(54, this.keyCodes.length), this.keyDescriptions)}</li>
       </ul>
     </div>
     <p class="keyboard-addition">
@@ -53,15 +53,15 @@ export default class Keyboard {
   }
 
   applySpecialBehaviour(keyName, code) {
-    Keyboard.toggleSpecialButton(keyName, code);
+    Keyboard.toggleSpecialButton(keyName);
     this.makeSpecialAction(keyName, code);
   }
 
   makeSpecialAction(keyName, code) {
     if (keyName === 'Shift') {
       this.isShiftActive = !this.isShiftActive;
-      this.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
       this.updateDigitsKeyboardLayout();
+      this.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
     } else if (keyName === 'CapsLock') {
       this.isCapsActive = !this.isCapsActive;
       this.updateCaseKeyboardLayout(
@@ -77,7 +77,7 @@ export default class Keyboard {
   }
 
   static toggleSpecialButton(keyName) {
-    const keys = document.querySelectorAll(`[data-value="${keyName}"]`);
+    const keys = document.querySelectorAll(`.key_${keyName.toLowerCase()}`);
     keys.forEach((element) => {
       element.classList.toggle('active');
 
@@ -95,10 +95,11 @@ export default class Keyboard {
     const letters = document.querySelectorAll('.key_letters');
     letters.forEach((elem) => {
       const code = elem.getAttribute('data-code');
-      const valueToChange = this.lang === 'ENG' ? this.keyDescriptions[code].eng : this.keyDescriptions[code].ru;
-      const changedValue = triggerCase ? valueToChange.toUpperCase() : valueToChange.toLowerCase();
+      const { activeValue } = this.keyDescriptions[code];
+      const changedValue = triggerCase ? activeValue.toUpperCase() : activeValue.toLowerCase();
       const elemToChange = elem.querySelector('.key-main-value');
       elemToChange.innerText = changedValue;
+      this.keyDescriptions[code].activeValue = changedValue;
     });
   }
 
@@ -106,17 +107,21 @@ export default class Keyboard {
     const digits = document.querySelectorAll('.key_digits');
     digits.forEach((elem) => {
       const code = elem.getAttribute('data-code');
-      const mainElemToChange = elem.querySelector('.key-main-value');
-      const addElemToChange = elem.querySelector('.key-addition-value');
-      const { addition } = this.keyDescriptions[code];
-      const value = 'ENG' ? this.keyDescriptions[code].eng : this.keyDescriptions[code].ru;
+      if (!(code === 'Backquote' && this.lang === 'RU')) {
+        const mainElemToChange = elem.querySelector('.key-main-value');
+        const addElemToChange = elem.querySelector('.key-addition-value');
+        const {
+          addition, activeValue, ru, eng,
+        } = this.keyDescriptions[code];
 
-      if (addElemToChange.innerText === addition) {
-        addElemToChange.innerText = value;
-        mainElemToChange.innerText = addition;
-      } else {
-        addElemToChange.innerText = addition;
-        mainElemToChange.innerText = value;
+        if (addition !== activeValue) {
+          this.keyDescriptions[code].activeValue = addition;
+        } else {
+          this.keyDescriptions[code].activeValue = this.lang === 'RU' ? ru : eng;
+        }
+
+        mainElemToChange.innerText = this.keyDescriptions[code].activeValue;
+        addElemToChange.innerText = activeValue;
       }
     });
   }
@@ -126,7 +131,9 @@ export default class Keyboard {
     letters.forEach((elem) => {
       const code = elem.getAttribute('data-code');
       const elemToChange = elem.querySelector('.key-main-value');
-      elemToChange.innerText = this.lang === 'ENG' ? this.keyDescriptions[code].ru : this.keyDescriptions[code].eng;
+      const changedValue = this.lang === 'ENG' ? this.keyDescriptions[code].ru : this.keyDescriptions[code].eng;
+      elemToChange.innerText = changedValue;
+      this.keyDescriptions[code].activeValue = changedValue;
     });
   }
 
@@ -151,15 +158,11 @@ export default class Keyboard {
 
   checkValueToConcat(keyName, code) {
     let valueToConcat = keyName;
-
-    const { value, addition } = this.keyDescriptions[code];
-
+    const { value, activeValue } = this.keyDescriptions[code];
     if (value !== undefined) {
       valueToConcat = value;
-    } else if (addition !== undefined && (this.isShiftActive)) {
-      valueToConcat = addition;
-    } else if (this.isShiftActive !== this.isCapsActive) {
-      valueToConcat = keyName.toUpperCase();
+    } else {
+      valueToConcat = activeValue;
     }
 
     return valueToConcat;
@@ -197,20 +200,12 @@ export default class Keyboard {
     textArea.scrollTop = textArea.scrollHeight;
   }
 
-  static chooseLangForKey(object, lang) {
-    return object[lang.toLowerCase()];
-  }
-
   addListener() {
     document.addEventListener('keydown', (event) => {
       event.preventDefault();
       if (this.keyDescriptions[event.code]) {
-        let key = Keyboard.chooseLangForKey(this.keyDescriptions[event.code], this.lang);
+        const key = this.keyDescriptions[event.code].activeValue;
         const target = document.querySelector(`[data-code="${event.code}"]`);
-        if (this.isShiftActive && this.keyDescriptions[event.code].addition && !(event.code === 'Backquote' && this.lang === 'RU')) {
-          key = this.keyDescriptions[event.code].addition;
-        }
-
         if (target) {
           if (target.classList.contains('key_special')) {
             this.applySpecialBehaviour(key, event.code);
@@ -227,10 +222,9 @@ export default class Keyboard {
 
     document.addEventListener('click', (event) => {
       const target = event.target.closest('.key');
-
       if (target) {
         const code = target.getAttribute('data-code');
-        const key = Keyboard.chooseLangForKey(this.keyDescriptions[code], this.lang);
+        const key = this.keyDescriptions[code].activeValue;
         if (target.classList.contains('key_special')) {
           this.applySpecialBehaviour(key, code);
         } else {
