@@ -106,5 +106,5 @@ dist
 # css maps
 *.map
 
-# css
-*.css
+# scss
+*.scss
