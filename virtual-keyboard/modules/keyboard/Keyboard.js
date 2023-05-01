@@ -68,6 +68,9 @@ export default class Keyboard {
     } else if (keyName === 'Control' && this.isShiftActive) {
       this.applySpecialBehaviour('Shift', code);
       this.switchLang();
+      this.updateCaseKeyboardLayout(
+        this.isShiftActive !== this.isCapsActive,
+      );
     } else {
       this.changeTextarea(keyName, code);
     }
