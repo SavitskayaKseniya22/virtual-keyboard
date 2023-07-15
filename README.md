@@ -8,3 +8,8 @@
 ### Screenshots: 
 ![изображение](https://github.com/SavitskayaKseniya22/virtual-keyboard/assets/77901301/a7234b5c-2adf-49fa-bae0-537a5d881193)
 
+### Technologies used: 
++ Javascript
++ Sass
++ Eslint
+
