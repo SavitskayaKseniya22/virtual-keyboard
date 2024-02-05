@@ -1,5 +1,6 @@
 import Key from '../key/Key.js';
-import alphabet from '../../assets/scripts/utilities.js';
+import alphabet from '../../utilities.js';
+import './_keyboard.scss';
 
 export default class Keyboard {
   constructor() {
@@ -62,15 +63,11 @@ export default class Keyboard {
       this.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
     } else if (keyName === 'CapsLock') {
       this.isCapsActive = !this.isCapsActive;
-      this.updateCaseKeyboardLayout(
-        this.isShiftActive !== this.isCapsActive,
-      );
+      this.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
     } else if (keyName === 'Control' && this.isShiftActive) {
       this.applySpecialBehaviour('Shift', code);
       this.switchLang();
-      this.updateCaseKeyboardLayout(
-        this.isShiftActive !== this.isCapsActive,
-      );
+      this.updateCaseKeyboardLayout(this.isShiftActive !== this.isCapsActive);
     } else {
       this.changeTextarea(keyName, code);
     }
@@ -97,7 +94,9 @@ export default class Keyboard {
     letters.forEach((elem) => {
       const code = elem.getAttribute('data-code');
       const { activeValue } = this.keyDescriptions[code];
-      const changedValue = triggerCase ? activeValue.toUpperCase() : activeValue.toLowerCase();
+      const changedValue = triggerCase
+        ? activeValue.toUpperCase()
+        : activeValue.toLowerCase();
       const elemToChange = elem.querySelector('.key-main-value');
       elemToChange.innerText = changedValue;
       this.keyDescriptions[code].activeValue = changedValue;
@@ -111,14 +110,13 @@ export default class Keyboard {
       if (!(code === 'Backquote' && this.lang === 'RU')) {
         const mainElemToChange = elem.querySelector('.key-main-value');
         const addElemToChange = elem.querySelector('.key-addition-value');
-        const {
-          addition, activeValue, ru, eng,
-        } = this.keyDescriptions[code];
+        const { addition, activeValue, ru, eng } = this.keyDescriptions[code];
 
         if (addition !== activeValue) {
           this.keyDescriptions[code].activeValue = addition;
         } else {
-          this.keyDescriptions[code].activeValue = this.lang === 'RU' ? ru : eng;
+          this.keyDescriptions[code].activeValue =
+            this.lang === 'RU' ? ru : eng;
         }
 
         mainElemToChange.innerText = this.keyDescriptions[code].activeValue;
@@ -132,7 +130,10 @@ export default class Keyboard {
     letters.forEach((elem) => {
       const code = elem.getAttribute('data-code');
       const elemToChange = elem.querySelector('.key-main-value');
-      const changedValue = this.lang === 'ENG' ? this.keyDescriptions[code].ru : this.keyDescriptions[code].eng;
+      const changedValue =
+        this.lang === 'ENG'
+          ? this.keyDescriptions[code].ru
+          : this.keyDescriptions[code].eng;
       elemToChange.innerText = changedValue;
       this.keyDescriptions[code].activeValue = changedValue;
     });
@@ -171,18 +172,29 @@ export default class Keyboard {
 
   static checkPositionToConcat(keyName, textArea) {
     let [start, end] = [textArea.selectionStart, textArea.selectionEnd];
-    const upValue = textArea.selectionEnd - Number(textArea.getAttribute('cols')) < 0 ? 0 : textArea.selectionEnd - Number(textArea.getAttribute('cols'));
+    const upValue =
+      textArea.selectionEnd - Number(textArea.getAttribute('cols')) < 0
+        ? 0
+        : textArea.selectionEnd - Number(textArea.getAttribute('cols'));
     const positions = {
       Delete: [textArea.selectionStart, textArea.selectionEnd + 1],
       Backspace: [textArea.selectionStart - 1, textArea.selectionEnd],
       ArrowLeft: [textArea.selectionStart - 1, textArea.selectionEnd - 1],
       ArrowUp: [upValue, upValue],
-      ArrowDown: [Number(textArea.getAttribute('cols')) + textArea.selectionEnd, Number(textArea.getAttribute('cols')) + textArea.selectionEnd],
+      ArrowDown: [
+        Number(textArea.getAttribute('cols')) + textArea.selectionEnd,
+        Number(textArea.getAttribute('cols')) + textArea.selectionEnd,
+      ],
       ArrowRight: [textArea.selectionStart + 1, textArea.selectionEnd + 1],
     };
 
     if (positions[keyName]) {
-      if ((keyName === 'Backspace' || keyName === 'ArrowLeft' || keyName === 'ArrowUp') && textArea.selectionEnd === 0) {
+      if (
+        (keyName === 'Backspace' ||
+          keyName === 'ArrowLeft' ||
+          keyName === 'ArrowUp') &&
+        textArea.selectionEnd === 0
+      ) {
         return [start, end];
       }
       [start, end] = positions[keyName];

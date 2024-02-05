@@ -1,3 +1,5 @@
+import './_key.scss';
+
 export default class Key {
   constructor(key, object) {
     this.keyObject = object[key];
