@@ -1,15 +1,31 @@
-## Virtual keyboard: 
+# [Virtual keyboard](https://poetic-tarsier-ff7606.netlify.app/)
+Simple virtual keyboard
 
+## Tech Stack
+- Javascript
+- Sass
+- Eslint
+- Prettier
+- Webpack
+- Normalize.css
 
-[Task](https://github.com/rolling-scopes-school/tasks/blob/master/tasks/virtual-keyboard/virtual-keyboard-en.md)
+## How to use
+1. Clone the repo
+``` bash
+git clone https://github.com/SavitskayaKseniya22/virtual-keyboard.git
+```
 
-[Deploy](https://savitskayakseniya22.github.io/virtual-keyboard/virtual-keyboard/)
+2. Install dependencies
+``` bash
+npm install
+```
+
+3. Start the dev server
+``` bash
+npm start
+```
 
 ### Screenshots: 
 ![изображение](https://github.com/SavitskayaKseniya22/virtual-keyboard/assets/77901301/a7234b5c-2adf-49fa-bae0-537a5d881193)
 
-### Technologies used: 
-+ Javascript
-+ Sass
-+ Eslint
 
