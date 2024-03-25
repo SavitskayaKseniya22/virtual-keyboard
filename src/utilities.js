@@ -224,7 +224,7 @@ export default {
     array.splice(60, 0, '↑');
     array.splice(61, 0, '↓');
     array.splice(62, 0, '→');
-    return (array);
+    return array;
   },
   makeValueToConcat() {
     const array = new Array(63);
@@ -242,7 +242,7 @@ export default {
     array.splice(61, 0, '');
     array.splice(62, 0, '');
 
-    return (array);
+    return array;
   },
 
   merge(lang) {
@@ -258,7 +258,6 @@ export default {
         shortcut: shortcut[index],
         value: values[index],
         index,
-
       };
     });
 
