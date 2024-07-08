@@ -1,4 +1,4 @@
-import './_key.scss';
+import "./_key.scss";
 
 export default class Key {
   constructor(key, object) {
@@ -11,21 +11,21 @@ export default class Key {
   }
 
   static makeClassList(value, key) {
-    let classList = 'key';
+    let classList = "key";
     if (value.length > 1) {
       classList += ` key_special key_${value.toLowerCase()}`;
     } else {
-      classList += /^[0-9-=\\]$/.test(value) ? ' key_digits' : ' key_letters';
+      classList += /^[0-9-=\\]$/.test(value) ? " key_digits" : " key_letters";
     }
 
-    classList += key === 'Backquote' ? ' key_digits' : '';
+    classList += key === "Backquote" ? " key_digits" : "";
     return classList;
   }
 
   makeKeyHTML() {
     return `<div ${`data-code="${this.key}"`} class="${this.classList}">
       <span class="key-main-value">${this.shortcut || this.value}</span
-      >${this.addition ? `<span class="key-addition-value">${this.addition}</span>` : ''}
+      >${this.addition ? `<span class="key-addition-value">${this.addition}</span>` : ""}
     </div>`;
   }
 }
